@@ -30,7 +30,7 @@ const locations = [
     brand: 'Descamps Rabat',
     address: 'Rabat, Maroc',
     phone: '+212 666-427890',
-    hours: ['Lun – Sam : 10h00 – 20h00', 'Dimanche : 11h00 – 18h00'],
+    hours: ['Lun – Dim : 10h00 – 20h00', '7J/7'],
     mapsUrl: 'https://www.google.com/maps/place/Descamps/@33.9545219,-6.8527329',
     embedUrl: 'https://maps.google.com/maps?q=33.9545219,-6.8527329&z=15&output=embed',
   },
