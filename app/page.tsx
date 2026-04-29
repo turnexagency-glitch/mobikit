@@ -52,7 +52,7 @@ const brands = [
   { name: 'Descamps', tagline: 'Paris · Depuis 1802', href: '/marques/descamps' },
   { name: 'TRECA', tagline: 'Paris · Literie de Prestige', href: '/marques/treca' },
   { name: 'Pyrenex', tagline: 'Duvet & Plumes Premium', href: '/marques/pyrenex' },
-  { name: 'Aquanova', tagline: 'Design Scandinave', href: '/marques/aquanova' },
+  { name: 'Aquanova', tagline: 'Design Belge', href: '/marques/aquanova' },
   { name: 'Esteban', tagline: 'Paris · Parfums', href: '/marques/esteban' },
   { name: 'Le Jacquard Français', tagline: 'Art de la Table', href: '/marques/le-jacquard-francais' },
   { name: 'Brun de Vian-Tiran', tagline: 'Laine Merinos · Depuis 1808', href: '/marques/brun-de-vian-tiran' },
@@ -302,7 +302,7 @@ export default function HomePage() {
                 <div className="font-serif text-xl font-light text-white group-hover:text-gold transition-colors duration-300 mb-2">
                   {brand.name}
                 </div>
-                <div className="text-[10px] tracking-widest text-gray-600 group-hover:text-gold/60 transition-colors">
+                <div className="text-[10px] tracking-widest text-gray-400 group-hover:text-gold transition-colors">
                   {brand.tagline}
                 </div>
               </Link>
