@@ -54,8 +54,8 @@ const brands = [
   },
   {
     name: 'Aquanova',
-    tagline: 'Design Scandinave',
-    description: 'Marque belge au design épuré, Aquanova propose des accessoires et textiles de salle de bain alliant fonctionnalité et esthétique minimaliste.',
+    tagline: 'Design Belge',
+    description: 'Marque belge au design épuré, Aquanova propose des accessoires et textiles de salle de bain alliant fonctionnalité et esthétique contemporaine.',
     categories: ['Linge de Bain', 'Accessoires SDB'],
     href: '/marques/aquanova',
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
@@ -100,16 +100,6 @@ const brands = [
     href: '/marques/ilum',
     image: 'https://images.unsplash.com/photo-1602523961358-f9f03dd557db?w=600&q=80',
     country: 'Irlande',
-    featured: false,
-  },
-  {
-    name: 'Peluce',
-    tagline: 'Douceur & Raffinement',
-    description: 'Marque française spécialisée dans les textiles doux et moelleux, alliant confort exceptionnel et élégance pour la maison.',
-    categories: ['Linge de Maison', 'Décoration'],
-    href: '/marques/peluce',
-    image: 'https://images.unsplash.com/photo-1614267157481-ca2b81ac6fcc?w=600&q=80',
-    country: 'France',
     featured: false,
   },
   {
