@@ -18,10 +18,9 @@ const locations = [
     address: 'Casablanca, Maroc',
     phone: '+212 666-427890',
     hours: [
-      'Lun – Mar – Mer – Jeu – Ven : 09h00–12h30 / 15h00–19h30',
+      'Lun – Ven : 09h00–12h30 / 15h00–19h30',
       'Samedi : 09h00–12h30 / 15h00–19h30',
       'Dimanche : Fermé',
-      '* Les horaires peuvent être différents',
     ],
     mapsUrl: 'https://google.com/maps/place/Descamps/data=!4m2!3m1!1s0x0:0x90d5627baa932cb1',
     embedUrl: 'https://maps.google.com/maps?q=Descamps+Casablanca+Maroc&z=15&output=embed',
