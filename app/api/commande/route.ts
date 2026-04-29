@@ -1,8 +1,6 @@
 import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 function emailClient(data: {
   prenom: string; nom: string; email: string; telephone: string
   adresse: string; ville: string; instructions: string
@@ -155,6 +153,13 @@ export async function POST(req: NextRequest) {
 
     const fromEmail = process.env.FROM_EMAIL || 'noreply@mobikit.ma'
     const adminEmail = process.env.ADMIN_EMAIL || 'commandes@mobikit.ma'
+
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('RESEND_API_KEY not configured — email not sent')
+      return NextResponse.json({ success: true, orderId, emailSent: false })
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY)
 
     const [clientResult, adminResult] = await Promise.all([
       // Email au client
