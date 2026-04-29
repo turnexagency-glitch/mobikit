@@ -1,0 +1,170 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import { MapPin, Clock, Phone, CalendarDays, ExternalLink } from 'lucide-react'
+
+const photos = [
+  'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&q=80',
+  'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&q=80',
+  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',
+  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80',
+  'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
+  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
+]
+
+const locations = [
+  {
+    city: 'Casablanca',
+    brand: 'Descamps Casablanca',
+    address: 'Casablanca, Maroc',
+    phone: '+212 666-427890',
+    hours: ['Lun – Sam : 10h00 – 20h00', 'Dimanche : 11h00 – 18h00'],
+    mapsUrl: 'https://google.com/maps/place/Descamps/data=!4m2!3m1!1s0x0:0x90d5627baa932cb1',
+    embedUrl: 'https://maps.google.com/maps?q=Descamps+Casablanca+Maroc&z=15&output=embed',
+  },
+  {
+    city: 'Rabat',
+    brand: 'Descamps Rabat',
+    address: 'Rabat, Maroc',
+    phone: '+212 666-427890',
+    hours: ['Lun – Sam : 10h00 – 20h00', 'Dimanche : 11h00 – 18h00'],
+    mapsUrl: 'https://www.google.com/maps/place/Descamps/@33.9545219,-6.8527329',
+    embedUrl: 'https://maps.google.com/maps?q=33.9545219,-6.8527329&z=15&output=embed',
+  },
+]
+
+export default function ShowroomPage() {
+  return (
+    <>
+      {/* Hero */}
+      <section className="relative h-80 flex items-center justify-center overflow-hidden">
+        <Image src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80" alt="Showroom Mobikit" fill className="object-cover" />
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center text-white px-6">
+          <p className="section-subtitle text-gold mb-3">Venez Nous Rendre Visite</p>
+          <h1 className="font-serif text-5xl font-light">Nos Points de Vente</h1>
+        </div>
+      </section>
+
+      {/* Intro */}
+      <section className="py-14 px-6 bg-cream text-center">
+        <p className="text-sm text-charcoal-light max-w-xl mx-auto">
+          Retrouvez nos collections Descamps dans nos deux boutiques au Maroc. Nos conseillers vous accueillent pour vous guider dans votre choix.
+        </p>
+        <div className="flex justify-center gap-4 mt-6">
+          <a href="#casablanca" className="btn-primary">Casablanca</a>
+          <a href="#rabat" className="btn-outline">Rabat</a>
+        </div>
+      </section>
+
+      {/* Locations */}
+      {locations.map((loc, i) => (
+        <section
+          key={loc.city}
+          id={loc.city.toLowerCase()}
+          className={`py-20 px-6 ${i % 2 === 1 ? 'bg-cream' : 'bg-white'}`}
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className={`grid lg:grid-cols-2 gap-12 items-start ${i % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
+
+              {/* Info */}
+              <div className={i % 2 === 1 ? 'lg:order-2' : ''}>
+                <p className="section-subtitle mb-2">{loc.city}</p>
+                <h2 className="section-title mb-4">{loc.brand}</h2>
+                <div className="w-10 h-px bg-gold mb-8" />
+
+                <div className="space-y-6 mb-8">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 border border-gold flex items-center justify-center flex-shrink-0">
+                      <MapPin size={16} className="text-gold" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium tracking-widest uppercase text-charcoal mb-1">Adresse</p>
+                      <p className="text-xs text-charcoal-light">{loc.address}</p>
+                      <a
+                        href={loc.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] text-gold tracking-widest uppercase mt-2 hover:underline"
+                      >
+                        Ouvrir dans Google Maps <ExternalLink size={10} />
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 border border-gold flex items-center justify-center flex-shrink-0">
+                      <Clock size={16} className="text-gold" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium tracking-widest uppercase text-charcoal mb-1">Horaires</p>
+                      {loc.hours.map(h => (
+                        <p key={h} className="text-xs text-charcoal-light">{h}</p>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 border border-gold flex items-center justify-center flex-shrink-0">
+                      <Phone size={16} className="text-gold" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium tracking-widest uppercase text-charcoal mb-1">Téléphone</p>
+                      <a href={`tel:${loc.phone}`} className="text-xs text-charcoal-light hover:text-gold transition-colors">
+                        {loc.phone}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-cream border-l-2 border-gold mb-8">
+                  <div className="flex items-center gap-3 mb-2">
+                    <CalendarDays size={16} className="text-gold" />
+                    <p className="text-xs font-medium tracking-widest uppercase text-charcoal">Visite sur Rendez-Vous</p>
+                  </div>
+                  <p className="text-xs text-charcoal-light leading-relaxed">
+                    Pour un conseil personnalisé, prenez rendez-vous avec l&apos;un de nos experts.
+                  </p>
+                </div>
+
+                <Link href="/contact" className="btn-primary">Prendre Rendez-Vous</Link>
+              </div>
+
+              {/* Map */}
+              <div className={i % 2 === 1 ? 'lg:order-1' : ''}>
+                <div className="w-full h-80 lg:h-[450px] overflow-hidden border border-cream-dark shadow-sm">
+                  <iframe
+                    src={loc.embedUrl}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={`Carte ${loc.brand}`}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* Gallery */}
+      <section className="py-16 px-6 bg-charcoal-dark">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-[10px] tracking-ultra-wide uppercase text-gold mb-3">Galerie</p>
+            <h2 className="font-serif text-3xl font-light text-white">L&apos;Univers Mobikit</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {photos.map((photo, i) => (
+              <div key={i} className={`relative overflow-hidden ${i === 0 ? 'col-span-2 aspect-[16/7]' : 'aspect-square'}`}>
+                <Image src={photo} alt={`Showroom Mobikit ${i + 1}`} fill className="object-cover hover:scale-105 transition-transform duration-700" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
