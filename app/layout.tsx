@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import WhatsAppButton from '@/components/WhatsAppButton'
 
 export const metadata: Metadata = {
   title: 'Mobikit Home Collections | Linge de Maison Haut de Gamme au Maroc',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main>{children}</main>
         <Footer />
+        <WhatsAppButton />
       </body>
     </html>
   )
