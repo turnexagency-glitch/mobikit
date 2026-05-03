@@ -43,6 +43,16 @@ export async function getProductsByCategory(category: string) {
   `, { category })
 }
 
+export async function getProductsByBrand(brand: string) {
+  return client.fetch(`
+    *[_type == "product" && brand == $brand] | order(_createdAt desc) {
+      _id, name, brand, price, oldPrice, badge, inStock,
+      "slug": slug.current,
+      "image": images[0].asset->url,
+    }
+  `, { brand })
+}
+
 export async function getProductBySlug(slug: string) {
   return client.fetch(`
     *[_type == "product" && slug.current == $slug][0] {
