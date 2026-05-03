@@ -2,6 +2,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Star, Truck, Shield, RefreshCw, Headphones } from 'lucide-react'
 import SmartImage from '@/components/SmartImage'
+import { getFeaturedProducts } from '@/lib/sanity'
+
+export const dynamic = 'force-dynamic'
 
 const categories = [
   {
@@ -101,7 +104,8 @@ const services = [
   { icon: Headphones, title: 'Conseil Personnalisé', desc: 'Notre équipe vous accompagne' },
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
+  const sanityFeatured = await getFeaturedProducts().catch(() => [])
   return (
     <>
       {/* Hero */}
@@ -252,34 +256,47 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <div key={product.name} className="group cursor-pointer">
-                <div className="relative overflow-hidden aspect-[3/4] mb-4">
-                  <SmartImage
-                    src={product.image}
-                    fallback={product.fallback}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  {product.badge && (
-                    <div className="absolute top-3 left-3 bg-gold text-white text-[9px] tracking-widest uppercase px-2 py-1">
-                      {product.badge}
-                    </div>
-                  )}
-                  <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3">
-                    <button className="bg-white text-charcoal text-[10px] tracking-widest uppercase px-4 py-2 hover:bg-gold hover:text-white transition-colors">
-                      Ajouter au Panier
-                    </button>
+            {sanityFeatured.length > 0
+              ? sanityFeatured.map((product: any) => (
+                <Link key={product._id} href={`/produit/${product.slug}`} className="group cursor-pointer block">
+                  <div className="relative overflow-hidden aspect-[3/4] mb-4 bg-cream">
+                    {product.image
+                      ? <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                      : <div className="w-full h-full bg-cream-dark" />
+                    }
+                    {product.badge && (
+                      <div className="absolute top-3 left-3 bg-gold text-white text-[9px] tracking-widest uppercase px-2 py-1">
+                        {product.badge}
+                      </div>
+                    )}
                   </div>
-                </div>
-                <div>
+                  <p className="text-[10px] tracking-widest uppercase text-gold mb-1">{product.brand}</p>
+                  <h3 className="text-sm font-light text-charcoal mb-1 line-clamp-2 leading-snug">{product.name}</h3>
+                  <p className="text-sm font-medium text-charcoal">{product.price?.toLocaleString('fr-MA')} MAD</p>
+                </Link>
+              ))
+              : featuredProducts.map((product) => (
+                <div key={product.name} className="group cursor-pointer">
+                  <div className="relative overflow-hidden aspect-[3/4] mb-4">
+                    <SmartImage
+                      src={product.image}
+                      fallback={product.fallback}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    {product.badge && (
+                      <div className="absolute top-3 left-3 bg-gold text-white text-[9px] tracking-widest uppercase px-2 py-1">
+                        {product.badge}
+                      </div>
+                    )}
+                  </div>
                   <p className="text-[10px] tracking-widest uppercase text-gold mb-1">{product.brand}</p>
                   <h3 className="text-sm font-light text-charcoal mb-1 line-clamp-2 leading-snug">{product.name}</h3>
                   <p className="text-sm font-medium text-charcoal">{product.price} MAD</p>
                 </div>
-              </div>
-            ))}
+              ))
+            }
           </div>
         </div>
       </section>
