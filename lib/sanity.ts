@@ -34,23 +34,28 @@ export async function getFeaturedProducts() {
 }
 
 export async function getProductsByCategory(category: string) {
+  const aliases: Record<string, string[]> = {
+    'esteban-parfums': ['esteban-parfums', 'senteurs-bougies'],
+  }
+  const categories = aliases[category] || [category]
   return client.fetch(`
-    *[_type == "product" && category == $category] | order(_createdAt desc) {
+    *[_type == "product" && category in $categories] | order(_createdAt desc) {
       _id, name, brand, price, badge, inStock,
       "slug": slug.current,
       "image": images[0].asset->url,
     }
-  `, { category })
+  `, { categories })
 }
 
-export async function getProductsByBrand(brand: string) {
+export async function getProductsByBrand(brand: string | string[]) {
+  const brands = Array.isArray(brand) ? brand : [brand]
   return client.fetch(`
-    *[_type == "product" && brand == $brand] | order(_createdAt desc) {
+    *[_type == "product" && brand in $brands] | order(_createdAt desc) {
       _id, name, brand, price, oldPrice, badge, inStock,
       "slug": slug.current,
       "image": images[0].asset->url,
     }
-  `, { brand })
+  `, { brands })
 }
 
 export async function getProductBySlug(slug: string) {

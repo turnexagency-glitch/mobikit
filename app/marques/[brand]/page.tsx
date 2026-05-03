@@ -5,14 +5,14 @@ import { getProductsByBrand } from '@/lib/sanity'
 
 export const dynamic = 'force-dynamic'
 
-const brandData: Record<string, { name: string; tagline: string; country: string; description: string }> = {
+const brandData: Record<string, { name: string; tagline: string; country: string; description: string; brandQuery?: string[] }> = {
   'descamps': { name: 'Descamps', tagline: 'Filatier · Drapier depuis 1802', country: 'France · Paris', description: 'Maison fondée en 1802, Descamps incarne l\'excellence du linge de maison français. Percale, satin et matières nobles pour un sommeil d\'exception.' },
   'treca': { name: 'Treca Paris', tagline: 'Literie de Prestige', country: 'France · Paris', description: 'Manufactures françaises d\'excellence, Treca crée depuis des décennies des matelas et sommiers sur mesure pour les plus grands hôtels du monde.' },
   'pyrenex': { name: 'Pyrenex', tagline: 'Duvet & Plumes des Pyrénées', country: 'France', description: 'Spécialiste du duvet depuis 1859, Pyrenex sélectionne les meilleures plumes d\'oie pour des couettes et oreillers d\'une légèreté incomparable.' },
   'le-jacquard-francais': { name: 'Le Jacquard Français', tagline: 'Art du Tissu depuis 1888', country: 'France · Vosges', description: 'Tisseur d\'excellence depuis 1888, Le Jacquard Français perpétue l\'art du jacquard pour des linges de table et de bain d\'une beauté rare.' },
-  'esteban': { name: 'Esteban Parfums', tagline: 'Parfums & Senteurs d\'Intérieur', country: 'France · Paris', description: 'Maison de parfums d\'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.' },
-  'esteban-paris': { name: 'Esteban Parfums', tagline: 'Parfums & Senteurs d\'Intérieur', country: 'France · Paris', description: 'Maison de parfums d\'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.' },
-  'esteban-parfums': { name: 'Esteban Parfums', tagline: 'Parfums & Senteurs d\'Intérieur', country: 'France · Paris', description: 'Maison de parfums d\'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.' },
+  'esteban': { name: 'Esteban Parfums', tagline: 'Parfums & Senteurs d\'Intérieur', country: 'France · Paris', description: 'Maison de parfums d\'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.', brandQuery: ['Esteban Paris', 'Esteban Parfums'] },
+  'esteban-paris': { name: 'Esteban Parfums', tagline: 'Parfums & Senteurs d\'Intérieur', country: 'France · Paris', description: 'Maison de parfums d\'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.', brandQuery: ['Esteban Paris', 'Esteban Parfums'] },
+  'esteban-parfums': { name: 'Esteban Parfums', tagline: 'Parfums & Senteurs d\'Intérieur', country: 'France · Paris', description: 'Maison de parfums d\'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.', brandQuery: ['Esteban Paris', 'Esteban Parfums'] },
   'aquanova': { name: 'Aquanova', tagline: 'Design Belge', country: 'Belgique', description: 'Marque belge au design épuré, Aquanova propose des accessoires et textiles de salle de bain alliant fonctionnalité et esthétique contemporaine.' },
   'blomus': { name: 'Blomus', tagline: 'Design Contemporain', country: 'Allemagne', description: 'Marque allemande reconnue pour son design industriel épuré en acier inoxydable et béton.' },
   'brun-de-vian-tiran': { name: 'Brun de Vian-Tiran', tagline: 'Couvertures en Laine · Depuis 1808', country: 'France · Provence', description: 'Manufacture provençale fondée en 1808, BVT tisse des couvertures en laine mérinos et cachemire d\'une douceur incomparable.' },
@@ -29,7 +29,7 @@ export default async function BrandPage({ params }: { params: { brand: string } 
   const info = brandData[params.brand]
   if (!info) notFound()
 
-  const products = await getProductsByBrand(info.name)
+  const products = await getProductsByBrand((info as any).brandQuery || info.name)
 
   return (
     <>
