@@ -43,11 +43,11 @@ const brands = [
     featured: false,
   },
   {
-    name: 'Esteban Paris',
+    name: 'Esteban Parfums',
     tagline: 'Parfums & Senteurs d\'Intérieur',
     description: 'Maison de parfums d\'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.',
     categories: ['Bougies', 'Diffuseurs', 'Parfums'],
-    href: '/marques/esteban',
+    href: '/marques/esteban-parfums',
     image: 'https://images.unsplash.com/photo-1602523961358-f9f03dd557db?w=600&q=80',
     country: 'France · Paris',
     featured: false,

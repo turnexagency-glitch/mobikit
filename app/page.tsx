@@ -53,7 +53,7 @@ const brands = [
   { name: 'TRECA', tagline: 'Paris · Literie de Prestige', href: '/marques/treca' },
   { name: 'Pyrenex', tagline: 'Duvet & Plumes Premium', href: '/marques/pyrenex' },
   { name: 'Aquanova', tagline: 'Design Belge', href: '/marques/aquanova' },
-  { name: 'Esteban', tagline: 'Paris · Parfums', href: '/marques/esteban' },
+  { name: 'Esteban Parfums', tagline: 'Paris · Parfums d\'Intérieur', href: '/marques/esteban-parfums' },
   { name: 'Le Jacquard Français', tagline: 'Art de la Table', href: '/marques/le-jacquard-francais' },
   { name: 'Brun de Vian-Tiran', tagline: 'Laine Merinos · Depuis 1808', href: '/marques/brun-de-vian-tiran' },
   { name: 'Blomus', tagline: 'Design Contemporain', href: '/marques/blomus' },

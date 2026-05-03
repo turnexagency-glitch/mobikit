@@ -27,8 +27,8 @@ const categories = [
 
 const brands = [
   'Descamps', 'Treca', 'Pyrenex', 'Aquanova', 'Blomus',
-  'Esteban', 'Le Jacquard Français', 'Brun de Vian-Tiran', 'Pilus', 'Ilum',
-  'Oscar', 'Geodesis', 'Cosmic', 'La Savonnerie Royale', 'Vispring'
+  'Esteban Parfums', 'Le Jacquard Français', 'Brun de Vian-Tiran', 'Pilus', 'Ilum',
+  'Oscar', 'Geodesis', 'Cosmic', 'La Savonnerie Royale', 'Vispring',
 ]
 
 export default function Header() {
