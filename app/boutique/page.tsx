@@ -6,7 +6,7 @@ const categories = [
   { name: 'Linge de Lit', href: '/boutique/linge-de-lit', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80' },
   { name: 'Linge de Table', href: '/boutique/linge-de-table', image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80' },
   { name: 'Linge de Bain', href: '/boutique/linge-de-bain', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80' },
-  { name: 'Senteurs & Bougies', href: '/boutique/senteurs-bougies', image: 'https://images.unsplash.com/photo-1602523961358-f9f03dd557db?w=400&q=80' },
+  { name: 'Esteban Parfums', href: '/boutique/esteban-parfums', image: 'https://images.unsplash.com/photo-1602523961358-f9f03dd557db?w=400&q=80' },
   { name: 'Literie de Luxe', href: '/boutique/literie', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80' },
   { name: 'Mobilier', href: '/boutique/mobilier', image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=80' },
   { name: 'Décoration & Maison', href: '/boutique/decoration', image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&q=80' },

@@ -10,6 +10,7 @@ const categoryLabels: Record<string, string> = {
   'linge-de-table': 'Linge de Table',
   'linge-de-bain': 'Linge de Bain',
   'senteurs-bougies': 'Senteurs & Bougies',
+  'esteban-parfums': 'Esteban Parfums',
   'literie': 'Literie de Luxe',
   'mobilier': 'Mobilier',
   'decoration': 'Décoration & Maison',
