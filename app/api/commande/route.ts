@@ -1,5 +1,14 @@
 import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@sanity/client'
+
+const sanityClient = createClient({
+  projectId: '72y7gp1y',
+  dataset: 'production',
+  apiVersion: '2024-01-01',
+  useCdn: false,
+  token: process.env.SANITY_WRITE_TOKEN,
+})
 
 function emailClient(data: {
   prenom: string; nom: string; email: string; telephone: string
@@ -153,6 +162,38 @@ export async function POST(req: NextRequest) {
 
     const fromEmail = process.env.FROM_EMAIL || 'noreply@mobikit.ma'
     const adminEmail = process.env.ADMIN_EMAIL || 'commandes@mobikit.ma'
+
+    // Save order to Sanity
+    if (process.env.SANITY_WRITE_TOKEN) {
+      try {
+        await sanityClient.create({
+          _type: 'order',
+          orderId,
+          status: 'pending',
+          paymentMethod,
+          total,
+          createdAt: new Date().toISOString(),
+          customer: {
+            prenom: form.prenom,
+            nom: form.nom,
+            email: form.email,
+            telephone: form.telephone,
+            ville: form.ville,
+            adresse: form.adresse,
+            notes: form.notes || '',
+          },
+          items: items.map((i: any) => ({
+            _key: Math.random().toString(36).slice(2),
+            name: i.name,
+            brand: i.brand,
+            price: i.price,
+            qty: i.qty,
+          })),
+        })
+      } catch (e) {
+        console.error('Sanity save error:', e)
+      }
+    }
 
     if (!process.env.RESEND_API_KEY) {
       console.warn('RESEND_API_KEY not configured — email not sent')
