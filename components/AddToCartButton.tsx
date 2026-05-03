@@ -62,8 +62,8 @@ export default function AddToCartButton({ product }: { product: any }) {
           }`}
         >
           {added
-            ? <><Check size={14} /> Ajouté au panier</>
-            : <><ShoppingBag size={14} /> Ajouter au panier</>
+            ? <><Check size={14} /> Commandé ✓</>
+            : <><ShoppingBag size={14} /> Commander</>
           }
         </button>
       </div>
