@@ -1,12 +1,19 @@
 'use client'
-import { useRouter } from 'next/navigation'
 import { ShoppingBag } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
 
 export default function AddToCartButton({ product }: { product: any }) {
-  const router = useRouter()
+  const { addItem } = useCart()
 
   const handleCommander = () => {
-    router.push('/commande')
+    addItem({
+      id: product._id || product.slug,
+      name: product.name,
+      brand: product.brand || '',
+      price: product.price,
+      image: product.images?.[0] || product.image || '',
+      slug: product.slug,
+    })
   }
 
   return (

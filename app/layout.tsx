@@ -3,6 +3,8 @@ import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import CartDrawer from '@/components/CartDrawer'
+import { CartProvider } from '@/context/CartContext'
 
 export const metadata: Metadata = {
   title: 'Mobikit Home Collections | Linge de Maison Haut de Gamme au Maroc',
@@ -14,10 +16,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <WhatsAppButton />
+        <CartProvider>
+          <Header />
+          <CartDrawer />
+          <main>{children}</main>
+          <Footer />
+          <WhatsAppButton />
+        </CartProvider>
       </body>
     </html>
   )
