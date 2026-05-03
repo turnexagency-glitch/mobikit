@@ -58,6 +58,29 @@ export async function getProductsByBrand(brand: string | string[]) {
   `, { brands })
 }
 
+export async function getAllPosts() {
+  return client.fetch(`
+    *[_type == "post"] | order(publishedAt desc) {
+      _id, title, category, excerpt, readTime, featured,
+      "slug": slug.current,
+      "coverImage": coverImage.asset->url,
+      "publishedAt": publishedAt,
+    }
+  `)
+}
+
+export async function getPostBySlug(slug: string) {
+  return client.fetch(`
+    *[_type == "post" && slug.current == $slug][0] {
+      _id, title, category, excerpt, readTime,
+      "slug": slug.current,
+      "coverImage": coverImage.asset->url,
+      "publishedAt": publishedAt,
+      content,
+    }
+  `, { slug })
+}
+
 export async function getProductBySlug(slug: string) {
   return client.fetch(`
     *[_type == "product" && slug.current == $slug][0] {
