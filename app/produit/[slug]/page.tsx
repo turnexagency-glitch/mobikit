@@ -1,9 +1,9 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Shield, Truck, RefreshCw, Star } from 'lucide-react'
-import { getProductBySlug, getAllProducts } from '@/lib/sanity'
+import { getProductBySlug } from '@/lib/sanity'
 import AddToCartButton from '@/components/AddToCartButton'
+import ProductGallery from '@/components/ProductGallery'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,43 +36,18 @@ export default async function ProductPage({ params }: { params: { slug: string }
           <div className="grid lg:grid-cols-2 gap-14">
 
             {/* Images */}
-            <div>
-              <div className="relative aspect-square overflow-hidden bg-cream mb-3">
-                {images[0] ? (
-                  <Image
-                    src={images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-cream-dark">
-                    <span className="text-sm text-charcoal-light">Photo à venir</span>
-                  </div>
-                )}
-                {product.badge && (
-                  <span className="absolute top-4 left-4 bg-gold text-white text-[9px] tracking-widest uppercase px-3 py-1.5">
-                    {product.badge}
-                  </span>
-                )}
-                {discount && (
-                  <span className="absolute top-4 right-4 bg-charcoal text-white text-[9px] tracking-widest uppercase px-3 py-1.5">
-                    -{discount}%
-                  </span>
-                )}
-              </div>
-
-              {/* Thumbnails */}
-              {images.length > 1 && (
-                <div className="grid grid-cols-4 gap-2">
-                  {images.map((img, i) => (
-                    <div key={i} className="relative aspect-square overflow-hidden border border-cream-dark">
-                      <Image src={img} alt={`Vue ${i + 1}`} fill className="object-cover" />
-                    </div>
-                  ))}
-                </div>
+            <div className="relative">
+              {product.badge && (
+                <span className="absolute top-4 left-4 z-10 bg-gold text-white text-[9px] tracking-widest uppercase px-3 py-1.5">
+                  {product.badge}
+                </span>
               )}
+              {discount && (
+                <span className="absolute top-4 right-4 z-10 bg-charcoal text-white text-[9px] tracking-widest uppercase px-3 py-1.5">
+                  -{discount}%
+                </span>
+              )}
+              <ProductGallery images={images} name={product.name} />
             </div>
 
             {/* Details */}
