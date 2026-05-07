@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Phone, Mail, MapPin, Instagram, Facebook } from 'lucide-react'
+import { Phone, Mail, MapPin, Instagram, Facebook, Linkedin } from 'lucide-react'
 
 const PinterestIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -60,6 +60,9 @@ export default function Footer() {
               </a>
               <a href="https://www.tiktok.com/@descamps.maroc/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors" title="TikTok">
                 <TikTokIcon />
+              </a>
+              <a href="https://www.linkedin.com/company/mobikit-sarl/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors" title="LinkedIn">
+                <Linkedin size={16} />
               </a>
             </div>
           </div>

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, ShoppingBag, User, Menu, X, Phone, Mail, ChevronDown, Instagram, Facebook } from 'lucide-react'
+import { Search, ShoppingBag, User, Menu, X, Phone, Mail, ChevronDown, Instagram, Facebook, Linkedin } from 'lucide-react'
 
 const PinterestIcon = () => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -67,6 +67,7 @@ export default function Header() {
             <a href="https://www.facebook.com/p/descamps_maroc-100064763023390/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors"><Facebook size={12} /></a>
             <a href="https://fr.pinterest.com/mobikit97/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors"><PinterestIcon /></a>
             <a href="https://www.tiktok.com/@descamps.maroc/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors"><TikTokIcon /></a>
+            <a href="https://www.linkedin.com/company/mobikit-sarl/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gold transition-colors"><Linkedin size={12} /></a>
           </div>
         </div>
       </div>
