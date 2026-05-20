@@ -27,20 +27,20 @@ const categories = [
 ]
 
 const brands = [
-  { name: 'Descamps',            slug: 'descamps',             logo: '/logos/descamps.png',             w: 180, h: 70 },
-  { name: 'Le Jacquard Français',slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png', w: 170, h: 75 },
-  { name: 'Esteban Parfums',     slug: 'esteban-parfums',      logo: '/logos/esteban.png',              w: 160, h: 65 },
-  { name: 'Aquanova',            slug: 'aquanova',             logo: '/logos/aquanova.png',             w: 155, h: 70 },
-  { name: 'Blomus',              slug: 'blomus',               logo: '/logos/blomus.png',               w: 150, h: 55 },
-  { name: 'Cosmic',              slug: 'cosmic',               logo: '/logos/cosmic.png',               w: 120, h: 52 },
-  { name: 'Pilus',               slug: 'pilus',                logo: '/logos/pilus.png',                w: 140, h: 58 },
-  { name: 'Brun de Vian-Tiran',  slug: 'brun-de-vian-tiran',   logo: '/logos/bvt.png',                  w: 90,  h: 72 },
-  { name: 'Ilum',                slug: 'ilum',                 logo: '/logos/ilum.png',                 w: 150, h: 65 },
-  { name: 'Oscar',               slug: 'oscar',                logo: '/logos/oscar.png',                w: 110, h: 52 },
-  { name: 'Geodesis',            slug: 'geodesis',             logo: '/logos/geodesis.png',             w: 140, h: 55 },
-  { name: 'La Savonnerie Royale',slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png',    w: 155, h: 72 },
-  { name: 'Treca',               slug: 'treca',                logo: '/logos/treca.png',                w: 150, h: 60 },
-  { name: 'Vispring',            slug: 'vispring',             logo: '/logos/vispring.png',             w: 160, h: 62 },
+  { name: 'Descamps',            slug: 'descamps',             logo: '/logos/descamps.png',             w: 160, h: 65, removeBg: true  },
+  { name: 'Le Jacquard Français',slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png', w: 155, h: 68, removeBg: true  },
+  { name: 'Esteban Parfums',     slug: 'esteban-parfums',      logo: '/logos/esteban.png',              w: 150, h: 62, removeBg: true  },
+  { name: 'Aquanova',            slug: 'aquanova',             logo: '/logos/aquanova.png',             w: 110, h: 50, removeBg: false },
+  { name: 'Blomus',              slug: 'blomus',               logo: '/logos/blomus.png',               w: 140, h: 52, removeBg: true  },
+  { name: 'Cosmic',              slug: 'cosmic',               logo: '/logos/cosmic.png',               w: 90,  h: 40, removeBg: false },
+  { name: 'Pilus',               slug: 'pilus',                logo: '/logos/pilus.png',                w: 130, h: 55, removeBg: true  },
+  { name: 'Brun de Vian-Tiran',  slug: 'brun-de-vian-tiran',   logo: '/logos/bvt.png',                  w: 75,  h: 62, removeBg: false },
+  { name: 'Ilum',                slug: 'ilum',                 logo: '/logos/ilum.png',                 w: 140, h: 60, removeBg: true  },
+  { name: 'Oscar',               slug: 'oscar',                logo: '/logos/oscar.png',                w: 80,  h: 40, removeBg: false },
+  { name: 'Geodesis',            slug: 'geodesis',             logo: '/logos/geodesis.png',             w: 100, h: 40, removeBg: false },
+  { name: 'La Savonnerie Royale',slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png',    w: 120, h: 58, removeBg: false },
+  { name: 'Treca',               slug: 'treca',                logo: '/logos/treca.png',                w: 140, h: 56, removeBg: true  },
+  { name: 'Vispring',            slug: 'vispring',             logo: '/logos/vispring.png',             w: 150, h: 58, removeBg: true  },
 ]
 
 export default function Header() {
@@ -197,7 +197,12 @@ export default function Header() {
                     alt={brand.name}
                     width={brand.w}
                     height={brand.h}
-                    style={{ width: brand.w, height: brand.h, objectFit: 'contain' }}
+                    style={{
+                      width: brand.w,
+                      height: brand.h,
+                      objectFit: 'contain',
+                      mixBlendMode: brand.removeBg ? 'multiply' : 'normal',
+                    }}
                     onError={(e: any) => {
                       e.currentTarget.style.display = 'none'
                     }}
