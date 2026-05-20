@@ -22,6 +22,8 @@ const categories = [
   { name: 'Linge de Bain', href: '/boutique/linge-de-bain' },
   { name: 'Esteban Parfums', href: '/boutique/esteban-parfums' },
   { name: 'Literie de Luxe', href: '/boutique/literie' },
+  { name: 'Pyjama & Homewear', href: '/boutique/pyjama-homewear' },
+  { name: 'Accessoires Salle de Bain', href: '/boutique/accessoires-sdb' },
   { name: 'Mobilier', href: '/boutique/mobilier' },
   { name: 'Décoration', href: '/boutique/decoration' },
 ]
