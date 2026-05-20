@@ -27,20 +27,20 @@ const categories = [
 ]
 
 const brands = [
-  { name: 'Descamps', slug: 'descamps', logo: '/logos/descamps.png' },
-  { name: 'Le Jacquard Français', slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png' },
-  { name: 'Esteban Parfums', slug: 'esteban-parfums', logo: '/logos/esteban.png' },
-  { name: 'Aquanova', slug: 'aquanova', logo: '/logos/aquanova.png' },
-  { name: 'Blomus', slug: 'blomus', logo: '/logos/blomus.png' },
-  { name: 'Cosmic', slug: 'cosmic', logo: '/logos/cosmic.png' },
-  { name: 'Pilus', slug: 'pilus', logo: '/logos/pilus.png' },
-  { name: 'Brun de Vian-Tiran', slug: 'brun-de-vian-tiran', logo: '/logos/bvt.png' },
-  { name: 'Ilum', slug: 'ilum', logo: '/logos/ilum.png' },
-  { name: 'Oscar', slug: 'oscar', logo: '/logos/oscar.png' },
-  { name: 'Geodesis', slug: 'geodesis', logo: '/logos/geodesis.png' },
-  { name: 'La Savonnerie Royale', slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png' },
-  { name: 'Treca', slug: 'treca', logo: '/logos/treca.png' },
-  { name: 'Vispring', slug: 'vispring', logo: '/logos/vispring.png' },
+  { name: 'Descamps',            slug: 'descamps',             logo: '/logos/descamps.png',          w: 100, h: 40 },
+  { name: 'Le Jacquard Français',slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png', w: 90, h: 44 },
+  { name: 'Esteban Parfums',     slug: 'esteban-parfums',      logo: '/logos/esteban.png',           w: 90, h: 38 },
+  { name: 'Aquanova',            slug: 'aquanova',             logo: '/logos/aquanova.png',          w: 110, h: 50 },
+  { name: 'Blomus',              slug: 'blomus',               logo: '/logos/blomus.png',            w: 80, h: 30 },
+  { name: 'Cosmic',              slug: 'cosmic',               logo: '/logos/cosmic.png',            w: 80, h: 32 },
+  { name: 'Pilus',               slug: 'pilus',                logo: '/logos/pilus.png',             w: 70, h: 32 },
+  { name: 'Brun de Vian-Tiran',  slug: 'brun-de-vian-tiran',   logo: '/logos/bvt.png',               w: 70, h: 52 },
+  { name: 'Ilum',                slug: 'ilum',                 logo: '/logos/ilum.png',              w: 80, h: 36 },
+  { name: 'Oscar',               slug: 'oscar',                logo: '/logos/oscar.png',             w: 70, h: 32 },
+  { name: 'Geodesis',            slug: 'geodesis',             logo: '/logos/geodesis.png',          w: 90, h: 34 },
+  { name: 'La Savonnerie Royale',slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png', w: 110, h: 52 },
+  { name: 'Treca',               slug: 'treca',                logo: '/logos/treca.png',             w: 80, h: 36 },
+  { name: 'Vispring',            slug: 'vispring',             logo: '/logos/vispring.png',          w: 90, h: 38 },
 ]
 
 export default function Header() {
@@ -182,36 +182,26 @@ export default function Header() {
         </div>
 
         {/* Brand logos bar */}
-        <div className="hidden lg:block border-t border-cream-dark bg-white">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between py-3">
+        <div className="hidden lg:block border-t border-b border-cream-dark bg-white">
+          <div className="w-full px-4">
+            <div className="flex items-center justify-between py-2 gap-2">
               {brands.map(brand => (
                 <Link
                   key={brand.slug}
                   href={`/marques/${brand.slug}`}
                   title={brand.name}
-                  className="flex-1 flex items-center justify-center group"
+                  className="flex items-center justify-center group shrink-0 opacity-75 hover:opacity-100 hover:scale-105 transition-all duration-300"
                 >
-                  <div className="w-20 h-9 flex items-center justify-center">
-                    <Image
-                      src={brand.logo}
-                      alt={brand.name}
-                      width={80}
-                      height={36}
-                      className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
-                      onError={(e: any) => {
-                        const parent = e.currentTarget.parentElement
-                        if (parent) {
-                          e.currentTarget.style.display = 'none'
-                          const span = parent.nextElementSibling
-                          if (span) span.style.display = 'block'
-                        }
-                      }}
-                    />
-                  </div>
-                  <span className="hidden text-[8px] tracking-widest uppercase text-charcoal-light font-medium text-center leading-tight">
-                    {brand.name}
-                  </span>
+                  <Image
+                    src={brand.logo}
+                    alt={brand.name}
+                    width={brand.w}
+                    height={brand.h}
+                    style={{ width: brand.w, height: brand.h, objectFit: 'contain' }}
+                    onError={(e: any) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
                 </Link>
               ))}
             </div>
