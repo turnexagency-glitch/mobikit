@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, ShoppingBag, User, Menu, X, Phone, Mail, ChevronDown, Instagram, Facebook, Linkedin } from 'lucide-react'
 
 const PinterestIcon = () => (
@@ -19,27 +20,27 @@ const categories = [
   { name: 'Linge de Lit', href: '/boutique/linge-de-lit' },
   { name: 'Linge de Table', href: '/boutique/linge-de-table' },
   { name: 'Linge de Bain', href: '/boutique/linge-de-bain' },
-  { name: 'Senteurs & Bougies', href: '/boutique/senteurs-bougies' },
+  { name: 'Esteban Parfums', href: '/boutique/esteban-parfums' },
   { name: 'Literie de Luxe', href: '/boutique/literie' },
   { name: 'Mobilier', href: '/boutique/mobilier' },
   { name: 'Décoration', href: '/boutique/decoration' },
 ]
 
 const brands = [
-  'Descamps',
-  'Le Jacquard Français',
-  'Esteban Parfums',
-  'Aquanova',
-  'Blomus',
-  'Cosmic',
-  'Pilus',
-  'Brun de Vian-Tiran',
-  'Ilum',
-  'Oscar',
-  'Geodesis',
-  'La Savonnerie Royale',
-  'Treca',
-  'Vispring',
+  { name: 'Descamps', slug: 'descamps', logo: '/logos/descamps.png' },
+  { name: 'Le Jacquard Français', slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png' },
+  { name: 'Esteban Parfums', slug: 'esteban-parfums', logo: '/logos/esteban.png' },
+  { name: 'Aquanova', slug: 'aquanova', logo: '/logos/aquanova.png' },
+  { name: 'Blomus', slug: 'blomus', logo: '/logos/blomus.png' },
+  { name: 'Cosmic', slug: 'cosmic', logo: '/logos/cosmic.png' },
+  { name: 'Pilus', slug: 'pilus', logo: '/logos/pilus.png' },
+  { name: 'Brun de Vian-Tiran', slug: 'brun-de-vian-tiran', logo: '/logos/bvt.png' },
+  { name: 'Ilum', slug: 'ilum', logo: '/logos/ilum.png' },
+  { name: 'Oscar', slug: 'oscar', logo: '/logos/oscar.png' },
+  { name: 'Geodesis', slug: 'geodesis', logo: '/logos/geodesis.png' },
+  { name: 'La Savonnerie Royale', slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png' },
+  { name: 'Treca', slug: 'treca', logo: '/logos/treca.png' },
+  { name: 'Vispring', slug: 'vispring', logo: '/logos/vispring.png' },
 ]
 
 export default function Header() {
@@ -47,7 +48,6 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [shopOpen, setShopOpen] = useState(false)
   const [brandsOpen, setBrandsOpen] = useState(false)
-  const [cartCount] = useState(0)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50)
@@ -84,13 +84,15 @@ export default function Header() {
       </div>
 
       {/* Main header */}
-      <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-sm' : 'bg-white'}`}>
+      <header className={`sticky top-0 z-50 transition-all duration-300 bg-white ${scrolled ? 'shadow-sm' : ''}`}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-20">
 
-            {/* Left nav */}
+            {/* Left nav : À Propos - Boutique - Nos Marques */}
             <nav className="hidden lg:flex items-center gap-8">
-              <div className="relative group">
+              <Link href="/a-propos" className="nav-link">À Propos</Link>
+
+              <div className="relative">
                 <button
                   className="nav-link flex items-center gap-1"
                   onMouseEnter={() => setShopOpen(true)}
@@ -129,19 +131,17 @@ export default function Header() {
                     onMouseLeave={() => setBrandsOpen(false)}
                   >
                     {brands.map(brand => (
-                      <Link key={brand} href={`/marques/${brand.toLowerCase().replace(/\s+/g, '-')}`}
+                      <Link key={brand.slug} href={`/marques/${brand.slug}`}
                         className="block px-6 py-2.5 text-xs tracking-widest uppercase text-charcoal hover:text-gold hover:pl-8 transition-all duration-200">
-                        {brand}
+                        {brand.name}
                       </Link>
                     ))}
                   </div>
                 )}
               </div>
-
-              <Link href="/showroom" className="nav-link">Showroom</Link>
             </nav>
 
-            {/* Logo */}
+            {/* Logo centré */}
             <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-center">
               <div className="font-serif text-3xl font-light tracking-wide text-charcoal-dark leading-none">
                 Mobikit
@@ -151,57 +151,86 @@ export default function Header() {
               </div>
             </Link>
 
-            {/* Right icons */}
-            <div className="flex items-center gap-5 ml-auto">
-              <button className="text-charcoal hover:text-gold transition-colors hidden md:block">
+            {/* Right nav : Showroom - Inspirations - Contact */}
+            <nav className="hidden lg:flex items-center gap-8">
+              <Link href="/showroom" className="nav-link">Showroom</Link>
+              <Link href="/blog" className="nav-link">Inspirations</Link>
+              <Link href="/contact" className="nav-link">Contact</Link>
+            </nav>
+
+            {/* Icons */}
+            <div className="flex items-center gap-5 lg:hidden ml-auto">
+              <Link href="/panier" className="text-charcoal hover:text-gold transition-colors relative">
+                <ShoppingBag size={18} />
+              </Link>
+              <button className="text-charcoal" onClick={() => setMobileOpen(!mobileOpen)}>
+                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
+            <div className="hidden lg:flex items-center gap-4 absolute right-6">
+              <button className="text-charcoal hover:text-gold transition-colors">
                 <Search size={18} />
               </button>
-              <Link href="/compte" className="text-charcoal hover:text-gold transition-colors hidden md:block">
+              <Link href="/compte" className="text-charcoal hover:text-gold transition-colors">
                 <User size={18} />
               </Link>
               <Link href="/panier" className="text-charcoal hover:text-gold transition-colors relative">
                 <ShoppingBag size={18} />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-gold text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-medium">
-                    {cartCount}
-                  </span>
-                )}
               </Link>
-              <button className="lg:hidden text-charcoal" onClick={() => setMobileOpen(!mobileOpen)}>
-                {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Secondary nav */}
-        <div className="hidden lg:block border-t border-cream-dark">
+        {/* Brand logos bar */}
+        <div className="hidden lg:block border-t border-cream-dark bg-white">
           <div className="max-w-7xl mx-auto px-6">
-            <nav className="flex justify-center gap-10 py-3">
-              <Link href="/a-propos" className="nav-link text-[10px]">À Propos</Link>
-              <Link href="/blog" className="nav-link text-[10px]">Inspirations</Link>
-              <Link href="/contact" className="nav-link text-[10px]">Contact</Link>
-              <Link href="/faq" className="nav-link text-[10px]">FAQ</Link>
-            </nav>
+            <div className="flex items-center justify-center gap-6 py-2.5 overflow-x-auto">
+              {brands.map(brand => (
+                <Link
+                  key={brand.slug}
+                  href={`/marques/${brand.slug}`}
+                  title={brand.name}
+                  className="flex-shrink-0 h-8 flex items-center opacity-60 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
+                >
+                  <Image
+                    src={brand.logo}
+                    alt={brand.name}
+                    width={80}
+                    height={32}
+                    className="object-contain h-7 w-auto"
+                    onError={(e: any) => {
+                      e.currentTarget.style.display = 'none'
+                      e.currentTarget.nextSibling.style.display = 'block'
+                    }}
+                  />
+                  <span
+                    className="hidden text-[9px] tracking-widest uppercase text-charcoal font-medium whitespace-nowrap"
+                  >
+                    {brand.name}
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
           <div className="lg:hidden bg-white border-t border-cream-dark">
-            <div className="px-6 py-4 space-y-4">
-              <p className="section-subtitle text-[10px]">Boutique</p>
+            <div className="px-6 py-4 space-y-3">
+              <Link href="/a-propos" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>À Propos</Link>
+              <p className="section-subtitle text-[10px] pt-2">Boutique</p>
               {categories.map(cat => (
-                <Link key={cat.href} href={cat.href} className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>
+                <Link key={cat.href} href={cat.href} className="block nav-link text-[10px] pl-3" onClick={() => setMobileOpen(false)}>
                   {cat.name}
                 </Link>
               ))}
-              <div className="border-t border-cream-dark pt-4 space-y-3">
-                <Link href="/a-propos" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>À Propos</Link>
+              <div className="border-t border-cream-dark pt-3 space-y-3">
                 <Link href="/marques" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>Nos Marques</Link>
                 <Link href="/showroom" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>Showroom</Link>
                 <Link href="/blog" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>Inspirations</Link>
                 <Link href="/contact" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>Contact</Link>
+                <Link href="/faq" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>FAQ</Link>
               </div>
             </div>
           </div>
