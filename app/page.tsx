@@ -22,11 +22,11 @@ const categories = [
     fallback: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
   },
   {
-    name: 'Literie de Luxe',
-    description: 'Matelas, couettes & oreillers',
-    href: '/boutique/literie',
-    image: '/images/treca-matelas-blanc.jpg',
-    fallback: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
+    name: 'Linge de Table',
+    description: 'Nappes, serviettes & sets',
+    href: '/boutique/linge-de-table',
+    image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+    fallback: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
   },
   {
     name: 'Décoration',
