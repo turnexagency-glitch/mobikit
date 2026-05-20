@@ -59,7 +59,7 @@ export default function AProposPage() {
                   Fondée en 1997, <strong className="text-charcoal">Mobikit</strong> s&apos;est imposée comme le distributeur de référence des grandes maisons européennes de linge de maison, literie, mobilier et décoration au Maroc.
                 </p>
                 <p>
-                  Depuis plus de 25 ans, nous sélectionnons avec exigence des maisons prestigieuses reconnues pour leur savoir-faire, leur qualité et leur élégance : <strong className="text-charcoal">Descamps, Treca Paris, Pyrenex, Le Jacquard Français</strong> et bien d&apos;autres.
+                  Depuis plus de 25 ans, nous sélectionnons avec exigence des maisons prestigieuses reconnues pour leur savoir-faire, leur qualité et leur élégance : <strong className="text-charcoal">Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums</strong> et bien d&apos;autres.
                 </p>
                 <p>
                   Animée par une passion pour le raffinement et l&apos;art de vivre à la française, Mobikit propose des collections haut de gamme alliant design, confort et excellence artisanale, afin d&apos;offrir une expérience unique à sa clientèle.
