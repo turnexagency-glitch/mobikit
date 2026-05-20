@@ -27,20 +27,20 @@ const categories = [
 ]
 
 const brands = [
-  { name: 'Descamps',            slug: 'descamps',             logo: '/logos/descamps.png',          w: 100, h: 40 },
-  { name: 'Le Jacquard Français',slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png', w: 90, h: 44 },
-  { name: 'Esteban Parfums',     slug: 'esteban-parfums',      logo: '/logos/esteban.png',           w: 90, h: 38 },
-  { name: 'Aquanova',            slug: 'aquanova',             logo: '/logos/aquanova.png',          w: 110, h: 50 },
-  { name: 'Blomus',              slug: 'blomus',               logo: '/logos/blomus.png',            w: 80, h: 30 },
-  { name: 'Cosmic',              slug: 'cosmic',               logo: '/logos/cosmic.png',            w: 80, h: 32 },
-  { name: 'Pilus',               slug: 'pilus',                logo: '/logos/pilus.png',             w: 70, h: 32 },
-  { name: 'Brun de Vian-Tiran',  slug: 'brun-de-vian-tiran',   logo: '/logos/bvt.png',               w: 70, h: 52 },
-  { name: 'Ilum',                slug: 'ilum',                 logo: '/logos/ilum.png',              w: 80, h: 36 },
-  { name: 'Oscar',               slug: 'oscar',                logo: '/logos/oscar.png',             w: 70, h: 32 },
-  { name: 'Geodesis',            slug: 'geodesis',             logo: '/logos/geodesis.png',          w: 90, h: 34 },
-  { name: 'La Savonnerie Royale',slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png', w: 110, h: 52 },
-  { name: 'Treca',               slug: 'treca',                logo: '/logos/treca.png',             w: 80, h: 36 },
-  { name: 'Vispring',            slug: 'vispring',             logo: '/logos/vispring.png',          w: 90, h: 38 },
+  { name: 'Descamps',            slug: 'descamps',             logo: '/logos/descamps.png',             w: 140, h: 56 },
+  { name: 'Le Jacquard Français',slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png', w: 130, h: 60 },
+  { name: 'Esteban Parfums',     slug: 'esteban-parfums',      logo: '/logos/esteban.png',              w: 120, h: 50 },
+  { name: 'Aquanova',            slug: 'aquanova',             logo: '/logos/aquanova.png',             w: 120, h: 56 },
+  { name: 'Blomus',              slug: 'blomus',               logo: '/logos/blomus.png',               w: 110, h: 44 },
+  { name: 'Cosmic',              slug: 'cosmic',               logo: '/logos/cosmic.png',               w: 90,  h: 40 },
+  { name: 'Pilus',               slug: 'pilus',                logo: '/logos/pilus.png',                w: 100, h: 44 },
+  { name: 'Brun de Vian-Tiran',  slug: 'brun-de-vian-tiran',   logo: '/logos/bvt.png',                  w: 75,  h: 58 },
+  { name: 'Ilum',                slug: 'ilum',                 logo: '/logos/ilum.png',                 w: 110, h: 50 },
+  { name: 'Oscar',               slug: 'oscar',                logo: '/logos/oscar.png',                w: 80,  h: 40 },
+  { name: 'Geodesis',            slug: 'geodesis',             logo: '/logos/geodesis.png',             w: 100, h: 40 },
+  { name: 'La Savonnerie Royale',slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png',    w: 120, h: 58 },
+  { name: 'Treca',               slug: 'treca',                logo: '/logos/treca.png',                w: 110, h: 46 },
+  { name: 'Vispring',            slug: 'vispring',             logo: '/logos/vispring.png',             w: 120, h: 48 },
 ]
 
 export default function Header() {
