@@ -186,14 +186,14 @@ export default function ContactPage() {
         </div>
         <div className="w-full h-96">
           <iframe
-            src="https://maps.google.com/maps?q=Descamps+Casablanca+Maroc&z=16&output=embed"
+            src="https://maps.google.com/maps?q=33.5757,-7.7070&z=18&output=embed"
             width="100%"
             height="100%"
             style={{ border: 0 }}
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            title="Descamps Casablanca — Mobikit Showroom"
+            title="Descamps Casablanca — Morocco Mall — Mobikit Showroom"
           />
         </div>
       </section>
