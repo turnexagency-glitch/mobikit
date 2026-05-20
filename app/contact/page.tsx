@@ -167,12 +167,34 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Map placeholder */}
-      <section className="h-80 bg-cream-dark flex items-center justify-center border-t border-cream">
-        <div className="text-center">
-          <MapPin size={32} className="text-gold mx-auto mb-3" />
-          <p className="font-serif text-xl font-light text-charcoal">Casablanca, Maroc</p>
-          <p className="text-xs text-charcoal-light mt-1 tracking-wide">Carte Google Maps intégrée en production</p>
+      {/* Map */}
+      <section className="border-t border-cream">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] tracking-widest uppercase text-gold font-medium flex items-center gap-2">
+              <MapPin size={12} /> Descamps Casablanca — Showroom Mobikit
+            </p>
+            <a
+              href="https://www.google.com/maps/place/Descamps/data=!4m2!3m1!1s0x0:0x90d5627baa932cb1?sa=X&ved=1t:2428&ictx=111"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] tracking-widest uppercase text-charcoal-light hover:text-gold transition-colors underline"
+            >
+              Ouvrir dans Google Maps ↗
+            </a>
+          </div>
+        </div>
+        <div className="w-full h-96">
+          <iframe
+            src="https://maps.google.com/maps?q=Descamps+Casablanca+Maroc&z=16&output=embed"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Descamps Casablanca — Mobikit Showroom"
+          />
         </div>
       </section>
     </>
