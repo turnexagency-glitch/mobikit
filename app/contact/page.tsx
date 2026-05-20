@@ -38,8 +38,8 @@ export default function ContactPage() {
                     <div>
                       <p className="text-xs font-medium tracking-widest uppercase text-charcoal mb-1">Showroom</p>
                       <p className="text-xs text-charcoal-light leading-relaxed">
-                        Casablanca, Maroc<br />
-                        (Adresse complète sur rendez-vous)
+                        Résidence Yasmine, 45 Bd Ghandi<br />
+                        Casablanca, Maroc
                       </p>
                     </div>
                   </div>
@@ -72,8 +72,9 @@ export default function ContactPage() {
                     <div>
                       <p className="text-xs font-medium tracking-widest uppercase text-charcoal mb-1">Horaires</p>
                       <p className="text-xs text-charcoal-light leading-relaxed">
-                        Lun – Ven : 9h00 – 18h00<br />
-                        Samedi : 10h00 – 14h00
+                        Lun – Ven : 09h00–12h30 / 15h00–19h30<br />
+                        Samedi : 09h00–12h30 / 15h00–19h30<br />
+                        Dimanche : Fermé
                       </p>
                     </div>
                   </div>
