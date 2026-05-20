@@ -184,28 +184,27 @@ export default function Header() {
         {/* Brand logos bar */}
         <div className="hidden lg:block border-t border-cream-dark bg-white">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-center gap-6 py-2.5 overflow-x-auto">
+            <div className="flex items-center justify-center gap-8 py-3 overflow-x-auto">
               {brands.map(brand => (
                 <Link
                   key={brand.slug}
                   href={`/marques/${brand.slug}`}
                   title={brand.name}
-                  className="flex-shrink-0 h-8 flex items-center opacity-60 hover:opacity-100 grayscale hover:grayscale-0 transition-all duration-300"
+                  className="flex-shrink-0 flex items-center justify-center opacity-70 hover:opacity-100 transition-all duration-300 hover:scale-105"
                 >
                   <Image
                     src={brand.logo}
                     alt={brand.name}
-                    width={80}
-                    height={32}
-                    className="object-contain h-7 w-auto"
+                    width={120}
+                    height={48}
+                    className="object-contain h-10 w-auto"
+                    style={{ mixBlendMode: 'multiply' }}
                     onError={(e: any) => {
                       e.currentTarget.style.display = 'none'
-                      e.currentTarget.nextSibling.style.display = 'block'
+                      if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block'
                     }}
                   />
-                  <span
-                    className="hidden text-[9px] tracking-widest uppercase text-charcoal font-medium whitespace-nowrap"
-                  >
+                  <span className="hidden text-[9px] tracking-widest uppercase text-charcoal font-medium whitespace-nowrap">
                     {brand.name}
                   </span>
                 </Link>
