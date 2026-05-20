@@ -98,7 +98,7 @@ export default function Header() {
                   onMouseEnter={() => setShopOpen(true)}
                   onMouseLeave={() => setShopOpen(false)}
                 >
-                  Boutique <ChevronDown size={12} />
+                  Nos Produits <ChevronDown size={12} />
                 </button>
                 {shopOpen && (
                   <div
@@ -218,7 +218,7 @@ export default function Header() {
           <div className="lg:hidden bg-white border-t border-cream-dark">
             <div className="px-6 py-4 space-y-3">
               <Link href="/a-propos" className="block nav-link text-[10px]" onClick={() => setMobileOpen(false)}>À Propos</Link>
-              <p className="section-subtitle text-[10px] pt-2">Boutique</p>
+              <p className="section-subtitle text-[10px] pt-2">Nos Produits</p>
               {categories.map(cat => (
                 <Link key={cat.href} href={cat.href} className="block nav-link text-[10px] pl-3" onClick={() => setMobileOpen(false)}>
                   {cat.name}
