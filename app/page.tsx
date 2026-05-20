@@ -36,11 +36,11 @@ const categories = [
     fallback: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80',
   },
   {
-    name: 'Mobilier',
-    description: 'Canapés, fauteuils & tables',
-    href: '/boutique/mobilier',
-    image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',
-    fallback: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',
+    name: 'Literie de Luxe',
+    description: 'Matelas, couettes & oreillers',
+    href: '/boutique/literie',
+    image: '/images/treca-matelas-blanc.jpg',
+    fallback: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
   },
   {
     name: 'Senteurs & Bougies',
