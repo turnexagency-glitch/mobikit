@@ -198,8 +198,7 @@ export default function Header() {
                       alt={brand.name}
                       width={80}
                       height={36}
-                      className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-100 transition-all duration-300"
-                      style={{ mixBlendMode: 'multiply' }}
+                      className="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
                       onError={(e: any) => {
                         const parent = e.currentTarget.parentElement
                         if (parent) {
