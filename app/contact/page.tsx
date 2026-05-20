@@ -175,7 +175,7 @@ export default function ContactPage() {
               <MapPin size={12} /> Descamps Casablanca — Showroom Mobikit
             </p>
             <a
-              href="https://www.google.com/maps/place/Descamps/data=!4m2!3m1!1s0x0:0x90d5627baa932cb1?sa=X&ved=1t:2428&ictx=111"
+              href="https://maps.app.goo.gl/Rovt7rcWNRFocR3g9"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[10px] tracking-widest uppercase text-charcoal-light hover:text-gold transition-colors underline"
@@ -186,7 +186,7 @@ export default function ContactPage() {
         </div>
         <div className="w-full h-96">
           <iframe
-            src="https://maps.google.com/maps?q=33.5757,-7.7070&z=18&output=embed"
+            src="https://maps.google.com/maps?q=33.5764273,-7.6524132&z=18&output=embed"
             width="100%"
             height="100%"
             style={{ border: 0 }}
