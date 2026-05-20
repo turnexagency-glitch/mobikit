@@ -184,27 +184,33 @@ export default function Header() {
         {/* Brand logos bar */}
         <div className="hidden lg:block border-t border-cream-dark bg-white">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-center gap-8 py-3 overflow-x-auto">
+            <div className="flex items-center justify-between py-3">
               {brands.map(brand => (
                 <Link
                   key={brand.slug}
                   href={`/marques/${brand.slug}`}
                   title={brand.name}
-                  className="flex-shrink-0 flex items-center justify-center opacity-70 hover:opacity-100 transition-all duration-300 hover:scale-105"
+                  className="flex-1 flex items-center justify-center group"
                 >
-                  <Image
-                    src={brand.logo}
-                    alt={brand.name}
-                    width={120}
-                    height={48}
-                    className="object-contain h-10 w-auto"
-                    style={{ mixBlendMode: 'multiply' }}
-                    onError={(e: any) => {
-                      e.currentTarget.style.display = 'none'
-                      if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block'
-                    }}
-                  />
-                  <span className="hidden text-[9px] tracking-widest uppercase text-charcoal font-medium whitespace-nowrap">
+                  <div className="w-20 h-9 flex items-center justify-center">
+                    <Image
+                      src={brand.logo}
+                      alt={brand.name}
+                      width={80}
+                      height={36}
+                      className="max-w-full max-h-full object-contain grayscale group-hover:grayscale-0 opacity-50 group-hover:opacity-100 transition-all duration-300"
+                      style={{ mixBlendMode: 'multiply' }}
+                      onError={(e: any) => {
+                        const parent = e.currentTarget.parentElement
+                        if (parent) {
+                          e.currentTarget.style.display = 'none'
+                          const span = parent.nextElementSibling
+                          if (span) span.style.display = 'block'
+                        }
+                      }}
+                    />
+                  </div>
+                  <span className="hidden text-[8px] tracking-widest uppercase text-charcoal-light font-medium text-center leading-tight">
                     {brand.name}
                   </span>
                 </Link>
