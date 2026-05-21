@@ -5,10 +5,28 @@ import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react'
 export default function ContactPage() {
   const [form, setForm] = useState({ nom: '', email: '', telephone: '', sujet: '', message: '' })
   const [sent, setSent] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSent(true)
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setSent(true)
+      } else {
+        setError('Une erreur est survenue. Veuillez réessayer.')
+      }
+    } catch {
+      setError('Une erreur est survenue. Veuillez réessayer.')
+    }
+    setLoading(false)
   }
 
   return (
@@ -158,8 +176,12 @@ export default function ContactPage() {
                       placeholder="Décrivez votre demande..."
                     />
                   </div>
-                  <button type="submit" className="btn-primary w-full flex items-center justify-center gap-2">
-                    <Send size={14} /> Envoyer le Message
+                  {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+                  <button type="submit" disabled={loading} className="btn-primary w-full flex items-center justify-center gap-2">
+                    {loading
+                      ? <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Envoi en cours...</>
+                      : <><Send size={14} /> Envoyer le Message</>
+                    }
                   </button>
                 </form>
               )}
