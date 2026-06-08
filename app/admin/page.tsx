@@ -585,6 +585,14 @@ export default function AdminPage() {
                     placeholder="Distributeur officiel de linge de maison haut de gamme au Maroc." />
                   <p className="text-[10px] text-charcoal-light mt-1">{(settings.seo_global?.default_description || '').length}/160 caractères</p>
                 </Field>
+                <Field label="Mots-clés principaux (séparés par des virgules)">
+                  <textarea value={settings.seo_global?.keywords || ''} onChange={e => us('seo_global', 'keywords', e.target.value)}
+                    rows={3} className="input-admin resize-none font-mono text-xs"
+                    placeholder="linge de maison maroc, descamps maroc, literie luxe maroc, couette maroc, parure de lit maroc..." />
+                  <p className="text-[10px] text-charcoal-light mt-1">
+                    {(settings.seo_global?.keywords || '').split(',').filter((k: string) => k.trim()).length} mot(s)-clé(s) · Google utilise surtout le titre et la description, mais les mots-clés restent utiles pour Bing et les autres moteurs.
+                  </p>
+                </Field>
                 <Field label="Image OG (partagée sur réseaux sociaux)">
                   <input value={settings.seo_global?.og_image || ''} onChange={e => us('seo_global', 'og_image', e.target.value)}
                     placeholder="/images/showroom-mobikit.webp" className="input-admin" />
@@ -635,6 +643,11 @@ export default function AdminPage() {
                         <input value={settings[key]?.description || ''} onChange={e => us(key, 'description', e.target.value)}
                           placeholder="Description pour Google..." className="input-admin text-xs" />
                         <p className="text-[10px] text-charcoal-light mt-0.5">{(settings[key]?.description || '').length}/160</p>
+                      </Field>
+                      <Field label="Mots-clés (séparés par virgules)" className="md:col-span-2">
+                        <input value={settings[key]?.keywords || ''} onChange={e => us(key, 'keywords', e.target.value)}
+                          placeholder="ex: linge de lit casablanca, parure de lit maroc, descamps maroc..."
+                          className="input-admin text-xs" />
                       </Field>
                     </div>
                     <div className="mt-2 flex justify-end">
