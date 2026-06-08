@@ -1,4 +1,4 @@
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -189,37 +189,44 @@ export async function POST(req: NextRequest) {
       console.error('Supabase save error:', e)
     }
 
-    if (!process.env.RESEND_API_KEY) {
-      console.warn('RESEND_API_KEY not configured — email not sent')
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.warn('SMTP non configuré — email non envoyé')
       return NextResponse.json({ success: true, orderId, emailSent: false })
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY)
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: (process.env.SMTP_PORT || '465') === '465',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: { rejectUnauthorized: false },
+    })
 
-    const [clientResult, adminResult] = await Promise.all([
-      // Email au client
-      resend.emails.send({
-        from: `Mobikit Home Collections <${fromEmail}>`,
-        to: form.email,
-        subject: `Confirmation de commande ${orderId} — Mobikit`,
-        html: emailClient({ ...form, paymentMethod, items, subtotal, shipping, total, orderId }),
-      }),
-      // Email interne
-      resend.emails.send({
-        from: `Mobikit Boutique <${fromEmail}>`,
-        to: adminEmail,
-        subject: `🛍️ Nouvelle commande ${orderId} — ${form.prenom} ${form.nom} — ${total.toLocaleString('fr-MA')} MAD`,
-        html: emailAdmin({ ...form, paymentMethod, items, total, orderId }),
-      }),
-    ])
-
-    // L'ordre est déjà sauvé — on retourne succès même si l'email échoue
-    if (clientResult.error || adminResult.error) {
-      console.error('Resend email error (order saved):', clientResult.error || adminResult.error)
+    try {
+      await Promise.all([
+        // Email de confirmation au client
+        transporter.sendMail({
+          from: `Mobikit Home Collections <${fromEmail}>`,
+          to: form.email,
+          subject: `Confirmation de commande ${orderId} — Mobikit`,
+          html: emailClient({ ...form, paymentMethod, items, subtotal, shipping, total, orderId }),
+        }),
+        // Notification interne à contact@mobikit.ma
+        transporter.sendMail({
+          from: `Mobikit Boutique <${fromEmail}>`,
+          to: adminEmail,
+          subject: `🛍️ Nouvelle commande ${orderId} — ${form.prenom} ${form.nom} — ${total.toLocaleString('fr-MA')} MAD`,
+          html: emailAdmin({ ...form, paymentMethod, items, total, orderId }),
+        }),
+      ])
+      return NextResponse.json({ success: true, orderId, emailSent: true })
+    } catch (emailErr) {
+      console.error('SMTP error (order saved):', emailErr)
       return NextResponse.json({ success: true, orderId, emailSent: false })
     }
-
-    return NextResponse.json({ success: true, orderId, emailSent: true })
   } catch (err) {
     console.error('API error:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
