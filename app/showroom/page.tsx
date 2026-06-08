@@ -3,12 +3,12 @@ import Link from 'next/link'
 import { MapPin, Clock, Phone, CalendarDays, ExternalLink } from 'lucide-react'
 
 const photos = [
-  'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&q=80',
-  'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&q=80',
-  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80',
-  'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80',
-  'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
-  'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
+  '/images/showroom-mobikit.webp',
+  '/images/descamps-bed-green.webp',
+  '/images/showroom-linge.webp',
+  '/images/descamps-bed-beige.webp',
+  '/images/esteban-diffuseurs.webp',
+  '/images/descamps-bed-floral.webp',
 ]
 
 const locations = [
@@ -41,7 +41,7 @@ export default function ShowroomPage() {
     <>
       {/* Hero */}
       <section className="relative h-80 flex items-center justify-center overflow-hidden">
-        <Image src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80" alt="Showroom Mobikit" fill className="object-cover" />
+        <Image src="/images/descamps-bed-teal.webp" alt="Showroom Mobikit" fill className="object-cover" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 text-center text-white px-6">
           <p className="section-subtitle text-gold mb-3">Venez Nous Rendre Visite</p>
