@@ -3,6 +3,20 @@ import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'Quels sont les délais de livraison au Maroc ?', acceptedAnswer: { '@type': 'Answer', text: 'Nous livrons dans tout le Maroc sous 3 à 5 jours ouvrables pour les grandes villes (Casablanca, Rabat, Marrakech, Fès), et 5 à 7 jours pour les autres régions.' } },
+    { '@type': 'Question', name: 'La livraison est-elle gratuite ?', acceptedAnswer: { '@type': 'Answer', text: 'La livraison est offerte pour toute commande supérieure à 2 000 MAD.' } },
+    { '@type': 'Question', name: 'Quels modes de paiement acceptez-vous ?', acceptedAnswer: { '@type': 'Answer', text: 'Nous acceptons le paiement à la livraison (cash on delivery) pour les commandes jusqu\'à 5 000 MAD, ainsi que le virement bancaire pour les grandes commandes.' } },
+    { '@type': 'Question', name: 'Les produits sont-ils authentiques ?', acceptedAnswer: { '@type': 'Answer', text: 'Absolument. Mobikit est distributeur officiel de toutes les marques présentes sur notre site. Chaque produit est accompagné de sa garantie fabricant d\'origine.' } },
+    { '@type': 'Question', name: 'Quelle est votre politique de retour ?', acceptedAnswer: { '@type': 'Answer', text: 'Vous disposez de 14 jours à partir de la réception de votre commande pour retourner un article dans son emballage d\'origine, non utilisé et non lavé.' } },
+    { '@type': 'Question', name: 'Comment entretenir mon linge de maison ?', acceptedAnswer: { '@type': 'Answer', text: 'Chaque produit est livré avec ses instructions d\'entretien. En général, nous recommandons un lavage à 40°C maximum pour préserver la qualité des fibres.' } },
+    { '@type': 'Question', name: 'Proposez-vous des conseils personnalisés ?', acceptedAnswer: { '@type': 'Answer', text: 'Oui ! Notre équipe de conseillers est disponible par téléphone, email ou en showroom pour vous aider à choisir les produits adaptés à vos besoins et votre budget.' } },
+  ],
+}
+
 const faqs = [
   {
     category: 'Commandes & Livraison',
@@ -60,6 +74,7 @@ function AccordionItem({ question, answer }: { question: string; answer: string 
 export default function FAQPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <section className="bg-cream py-16 px-6 text-center">
         <p className="section-subtitle mb-3">Aide</p>
         <h1 className="section-title">Questions Fréquentes</h1>

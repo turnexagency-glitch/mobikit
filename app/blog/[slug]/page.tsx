@@ -1,9 +1,31 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPostBySlug } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug)
+  if (!post) return {}
+  const title = post.seo_title || `${post.title} | Mobikit Blog`
+  const description = post.seo_description || post.excerpt || ''
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      url: `https://www.mobikit.ma/blog/${params.slug}`,
+      images: post.cover_image ? [{ url: post.cover_image, alt: post.title }] : [],
+      publishedTime: post.created_at,
+      modifiedTime: post.updated_at || post.created_at,
+    },
+    alternates: { canonical: `https://www.mobikit.ma/blog/${params.slug}` },
+  }
+}
 
 function formatDate(dateStr: string) {
   if (!dateStr) return ''
@@ -41,8 +63,36 @@ export default async function PostPage({ params }: { params: { slug: string } })
   const post = await getPostBySlug(params.slug)
   if (!post) notFound()
 
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt,
+    image: post.cover_image || 'https://www.mobikit.ma/images/showroom-mobikit.webp',
+    datePublished: post.created_at,
+    dateModified: post.updated_at || post.created_at,
+    author: { '@type': 'Organization', name: 'Mobikit Home Collections', url: 'https://www.mobikit.ma' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Mobikit Home Collections',
+      logo: { '@type': 'ImageObject', url: 'https://www.mobikit.ma/favicon.svg' },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `https://www.mobikit.ma/blog/${params.slug}` },
+  }
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://www.mobikit.ma' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.mobikit.ma/blog' },
+      { '@type': 'ListItem', position: 3, name: post.title, item: `https://www.mobikit.ma/blog/${params.slug}` },
+    ],
+  }
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([articleSchema, breadcrumbSchema]) }} />
       {/* Hero */}
       <section className="relative h-80 md:h-[500px] overflow-hidden">
         {post.cover_image ? (

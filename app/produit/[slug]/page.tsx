@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Shield, Truck, RefreshCw, Star } from 'lucide-react'
@@ -6,6 +7,26 @@ import AddToCartButton from '@/components/AddToCartButton'
 import ProductGallery from '@/components/ProductGallery'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const product = await getProductBySlug(params.slug)
+  if (!product) return {}
+  const title = `${product.name} | ${product.brand || 'Mobikit'} — Linge de Maison Maroc`
+  const description = product.description
+    ? product.description.slice(0, 155) + '...'
+    : `Achetez ${product.name} de ${product.brand || 'Mobikit'} au Maroc. Prix : ${product.price?.toLocaleString('fr-MA')} MAD. Livraison partout au Maroc.`
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://www.mobikit.ma/produit/${params.slug}`,
+      images: product.images?.[0] ? [{ url: product.images[0], alt: product.name }] : [],
+    },
+    alternates: { canonical: `https://www.mobikit.ma/produit/${params.slug}` },
+  }
+}
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const product = await getProductBySlug(params.slug)
@@ -20,6 +41,37 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   return (
     <>
+      {/* JSON-LD : Product + BreadcrumbList */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: product.description || `${product.name} par ${product.brand || 'Mobikit'}`,
+          brand: { '@type': 'Brand', name: product.brand || 'Mobikit' },
+          image: product.images || [],
+          sku: product.slug,
+          offers: {
+            '@type': 'Offer',
+            priceCurrency: 'MAD',
+            price: product.price,
+            availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            seller: { '@type': 'Organization', name: 'Mobikit' },
+            url: `https://www.mobikit.ma/produit/${product.slug}`,
+          },
+          ...(product.old_price ? { offers: { '@type': 'AggregateOffer', lowPrice: product.price, highPrice: product.old_price, priceCurrency: 'MAD' } } : {}),
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://www.mobikit.ma' },
+            { '@type': 'ListItem', position: 2, name: 'Boutique', item: 'https://www.mobikit.ma/boutique' },
+            { '@type': 'ListItem', position: 3, name: product.name, item: `https://www.mobikit.ma/produit/${product.slug}` },
+          ],
+        },
+      ]) }} />
+
       {/* Breadcrumb */}
       <div className="bg-cream border-b border-cream-dark px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center gap-2 text-[10px] tracking-widest uppercase text-charcoal-light">

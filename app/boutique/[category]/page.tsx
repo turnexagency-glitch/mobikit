@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -18,14 +19,52 @@ const categoryLabels: Record<string, string> = {
   'accessoires-sdb': 'Accessoires Salle de Bain',
 }
 
+const categoryKeywords: Record<string, string> = {
+  'linge-de-lit': 'linge de lit maroc, parure de lit casablanca, housse couette maroc, draps luxe maroc, descamps lit maroc',
+  'linge-de-table': 'linge de table maroc, nappe table casablanca, jacquard français maroc, serviette table luxe',
+  'linge-de-bain': 'linge de bain maroc, serviette bain luxe casablanca, peignoir luxe maroc, descamps bain',
+  'esteban-parfums': 'esteban parfums maroc, diffuseur esteban casablanca, bouquet parfumé maroc',
+  'senteurs-bougies': 'bougies parfumées maroc, senteurs maison maroc, diffuseur parfum casablanca',
+  'literie': 'literie luxe maroc, matelas haut de gamme casablanca, treca paris maroc, couette duvet maroc',
+  'mobilier': 'mobilier design maroc, meubles luxe casablanca, bolia maroc, hay maroc',
+  'decoration': 'décoration maison maroc, objets déco casablanca, vases design maroc',
+  'accessoires-sdb': 'accessoires salle de bain maroc, aquanova maroc, distributeur savon luxe',
+  'pyjama-homewear': 'pyjama luxe maroc, homewear maison maroc',
+}
+
+export async function generateMetadata({ params }: { params: { category: string } }): Promise<Metadata> {
+  const label = categoryLabels[params.category]
+  if (!label) return {}
+  const title = `${label} au Maroc | Mobikit — Linge de Maison Haut de Gamme`
+  const description = `Achetez du ${label.toLowerCase()} haut de gamme au Maroc. Grandes marques européennes chez Mobikit : Descamps, Le Jacquard Français, Esteban et plus. Livraison partout au Maroc.`
+  return {
+    title,
+    description,
+    keywords: categoryKeywords[params.category] || '',
+    openGraph: { title, description, url: `https://www.mobikit.ma/boutique/${params.category}` },
+    alternates: { canonical: `https://www.mobikit.ma/boutique/${params.category}` },
+  }
+}
+
 export default async function CategoryPage({ params }: { params: { category: string } }) {
   const label = categoryLabels[params.category]
   if (!label) notFound()
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://www.mobikit.ma' },
+      { '@type': 'ListItem', position: 2, name: 'Boutique', item: 'https://www.mobikit.ma/boutique' },
+      { '@type': 'ListItem', position: 3, name: label, item: `https://www.mobikit.ma/boutique/${params.category}` },
+    ],
+  }
 
   const products = await getProductsByCategory(params.category)
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <section className="bg-cream py-16 px-6 text-center">
         <p className="section-subtitle mb-3">
           <Link href="/boutique" className="hover:text-gold transition-colors">Boutique</Link>

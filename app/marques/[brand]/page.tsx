@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -6,6 +7,19 @@ import { getProductsByBrand } from '@/lib/supabase'
 import { getBrand } from '@/data/brands'
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: { params: { brand: string } }): Promise<Metadata> {
+  const localBrand = getBrand(params.brand)
+  const name = localBrand?.name || params.brand
+  const title = `${name} au Maroc | Distributeur Officiel Mobikit`
+  const description = localBrand?.description?.slice(0, 155) || `Découvrez la collection ${name} au Maroc chez Mobikit, distributeur officiel. Linge de maison haut de gamme livré partout au Maroc.`
+  return {
+    title,
+    description,
+    openGraph: { title, description, url: `https://www.mobikit.ma/marques/${params.brand}` },
+    alternates: { canonical: `https://www.mobikit.ma/marques/${params.brand}` },
+  }
+}
 
 export default async function BrandPage({ params }: { params: { brand: string } }) {
   // Sanity en priorité, fallback sur fichier local
