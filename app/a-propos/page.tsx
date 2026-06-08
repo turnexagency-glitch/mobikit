@@ -69,7 +69,7 @@ export default function AProposPage() {
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative aspect-[3/4] overflow-hidden">
-                  <Image src="/images/showroom-descamps-facade.webp" alt="Mobikit Showroom Descamps" fill className="object-cover" />
+                  <Image src="/images/showroom-mobikit.webp" alt="Mobikit Showroom" fill className="object-cover" />
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden mt-8">
                   <Image src="/images/showroom-linge.webp" alt="Mobikit Collections" fill className="object-cover" />
