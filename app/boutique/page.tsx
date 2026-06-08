@@ -1,6 +1,14 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getAllProducts } from '@/lib/supabase'
+
+export const metadata: Metadata = {
+  title: 'Boutique Linge de Maison Maroc | Mobikit',
+  description: 'Découvrez notre boutique en ligne : parures de lit, couettes, linge de bain, décoration et literie haut de gamme au Maroc. Livraison partout au Royaume.',
+  openGraph: { title: 'Boutique | Mobikit', url: 'https://www.mobikit.ma/boutique' },
+  alternates: { canonical: 'https://www.mobikit.ma/boutique' },
+}
 
 const categories = [
   { name: 'Linge de Lit', href: '/boutique/linge-de-lit', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80' },

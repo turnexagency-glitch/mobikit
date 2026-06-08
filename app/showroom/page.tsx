@@ -1,6 +1,14 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, Clock, Phone, CalendarDays, ExternalLink } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Showroom Mobikit | Boutique Descamps Casablanca & Rabat',
+  description: 'Visitez nos points de vente Descamps à Casablanca et Rabat. Collections de linge de maison haut de gamme en exclusivité. Conseil personnalisé sur rendez-vous.',
+  openGraph: { title: 'Showroom | Mobikit', url: 'https://www.mobikit.ma/showroom' },
+  alternates: { canonical: 'https://www.mobikit.ma/showroom' },
+}
 
 const photos = [
   '/images/showroom-mobikit.webp',

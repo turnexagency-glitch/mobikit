@@ -1,6 +1,14 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getAllBrands } from '@/lib/sanity'
+
+export const metadata: Metadata = {
+  title: 'Nos Marques | Descamps, Treca, Pyrenex, Le Jacquard Français — Mobikit Maroc',
+  description: 'Mobikit distribue officiellement au Maroc les plus grandes maisons françaises : Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums et bien d\'autres.',
+  openGraph: { title: 'Nos Marques | Mobikit', url: 'https://www.mobikit.ma/marques' },
+  alternates: { canonical: 'https://www.mobikit.ma/marques' },
+}
 import { brands as localBrands } from '@/data/brands'
 
 export const dynamic = 'force-dynamic'

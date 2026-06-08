@@ -1,6 +1,14 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getAllPosts } from '@/lib/supabase'
+
+export const metadata: Metadata = {
+  title: 'Blog | Inspirations Linge de Maison & Décoration — Mobikit',
+  description: 'Conseils déco, guides d\'achat, tendances et inspirations pour votre intérieur. Comment choisir sa couette, dresser une belle table, décorer sa chambre...',
+  openGraph: { title: 'Blog Inspirations | Mobikit', url: 'https://www.mobikit.ma/blog' },
+  alternates: { canonical: 'https://www.mobikit.ma/blog' },
+}
 
 export const dynamic = 'force-dynamic'
 

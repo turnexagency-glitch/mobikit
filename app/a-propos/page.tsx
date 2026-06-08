@@ -1,5 +1,13 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'À Propos de Mobikit | 25 Ans de Linge de Maison Haut de Gamme au Maroc',
+  description: 'Fondée en 1997, Mobikit s\'est imposée comme le distributeur de référence des grandes maisons européennes de linge de maison au Maroc. Descamps, Treca Paris, Pyrenex et bien d\'autres.',
+  openGraph: { title: 'Notre Histoire | Mobikit', url: 'https://www.mobikit.ma/a-propos' },
+  alternates: { canonical: 'https://www.mobikit.ma/a-propos' },
+}
 
 const values = [
   {
