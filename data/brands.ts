@@ -20,6 +20,7 @@ export const brands: Brand[] = [
     featured: true,
     categories: ['Linge de Lit', 'Linge de Bain'],
     sageNames: ['Descamps'],
+    coverImage: '/images/showroom-descamps-facade.webp',
   },
   {
     slug: 'treca',
@@ -59,6 +60,7 @@ export const brands: Brand[] = [
     description: "Maison de parfums d'intérieur parisienne, Esteban crée des fragrances raffinées pour sublimer votre espace de vie.",
     featured: false,
     categories: ['Bougies', 'Diffuseurs', 'Parfums'],
+    coverImage: '/images/showroom-esteban.webp',
     sageNames: ['Esteban Paris', 'Esteban Parfums'],
   },
   {

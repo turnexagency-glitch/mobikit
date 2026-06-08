@@ -173,8 +173,8 @@ export default async function HomePage() {
             <div className="relative">
               <div className="relative h-[500px] overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80"
-                  alt="Mobikit Showroom"
+                  src="/images/showroom-mobikit.webp"
+                  alt="Mobikit Showroom Casablanca"
                   fill
                   className="object-cover"
                 />
@@ -381,8 +381,8 @@ export default async function HomePage() {
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=1920&q=80"
-            alt="Mobikit Showroom"
+            src="/images/showroom-linge.webp"
+            alt="Mobikit Showroom Casablanca"
             fill
             className="object-cover"
           />
