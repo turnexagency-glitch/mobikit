@@ -83,3 +83,18 @@ export async function getPostBySlug(slug: string) {
   if (error) return null
   return data
 }
+
+export async function getSetting(key: string) {
+  const { data } = await supabase
+    .from('settings')
+    .select('value')
+    .eq('key', key)
+    .single()
+  return data?.value || null
+}
+
+export async function getAllSettings() {
+  const { data } = await supabase.from('settings').select('key, value')
+  if (!data) return {}
+  return Object.fromEntries(data.map(({ key, value }) => [key, value]))
+}

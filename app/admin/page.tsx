@@ -1,8 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { Eye, EyeOff, Package, TrendingUp, Clock, CheckCircle, Truck, XCircle,
-  ShoppingBag, RefreshCw, Star, Globe, GlobeLock, BookOpen, Plus, Trash2, Edit3, Search } from 'lucide-react'
+import {
+  Eye, EyeOff, Package, TrendingUp, Clock, CheckCircle, Truck, XCircle,
+  ShoppingBag, RefreshCw, Star, Globe, GlobeLock, BookOpen, Plus, Trash2,
+  Edit3, Search, Settings, Layout, Bell, Instagram, Facebook, ExternalLink,
+  Image as ImageIcon, Type, Phone, Mail, MapPin, Save, ChevronRight, Tag,
+} from 'lucide-react'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,12 +24,15 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
   cancelled: { label: 'Annulée',      color: 'bg-red-100 text-red-700',       icon: XCircle },
 }
 
+type Tab = 'commandes' | 'produits' | 'blog' | 'contenu' | 'seo'
+
 export default function AdminPage() {
+  const router = useRouter()
   const [password, setPassword] = useState('')
   const [showPwd, setShowPwd] = useState(false)
   const [auth, setAuth] = useState(false)
   const [error, setError] = useState('')
-  const [tab, setTab] = useState<'commandes' | 'produits' | 'blog'>('commandes')
+  const [tab, setTab] = useState<Tab>('commandes')
 
   // Commandes
   const [orders, setOrders] = useState<any[]>([])
@@ -40,7 +48,6 @@ export default function AdminPage() {
   const [prodPage, setProdPage] = useState(0)
   const [prodTotal, setProdTotal] = useState(0)
   const [prodFilter, setProdFilter] = useState<'all' | 'published' | 'hidden'>('all')
-  const [editProduct, setEditProduct] = useState<any>(null)
   const PAGE_SIZE = 50
 
   // Blog
@@ -49,9 +56,19 @@ export default function AdminPage() {
   const [editPost, setEditPost] = useState<any>(null)
   const [newPost, setNewPost] = useState(false)
 
+  // Settings (Contenu + SEO)
+  const [settings, setSettings] = useState<Record<string, any>>({})
+  const [settingsLoading, setSettingsLoading] = useState(false)
+  const [saving, setSaving] = useState<string | null>(null)
+  const [saved, setSaved] = useState<string | null>(null)
+
   const login = () => {
     if (password === ADMIN_PASSWORD) { setAuth(true); setError(''); loadOrders() }
     else setError('Mot de passe incorrect')
+  }
+
+  const revalidate = async () => {
+    await fetch('/api/revalidate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).catch(() => {})
   }
 
   // ─── Commandes ───────────────────────────────────────────────────────────────
@@ -71,7 +88,7 @@ export default function AdminPage() {
   }
 
   // ─── Produits ────────────────────────────────────────────────────────────────
-  const loadProducts = async (q = '', page = 0, filter = prodFilter) => {
+  const loadProducts = async (q = '', page = 0, f = prodFilter) => {
     setProdLoading(true)
     const from = page * PAGE_SIZE
     const to = from + PAGE_SIZE - 1
@@ -81,8 +98,8 @@ export default function AdminPage() {
       .order('name', { ascending: true })
       .range(from, to)
     if (q) query = query.ilike('name', `%${q}%`)
-    if (filter === 'published') query = query.eq('published', true)
-    if (filter === 'hidden') query = query.eq('published', false)
+    if (f === 'published') query = query.eq('published', true)
+    if (f === 'hidden') query = query.eq('published', false)
     const { data, count } = await query
     setProducts(data || [])
     setProdTotal(count || 0)
@@ -96,34 +113,12 @@ export default function AdminPage() {
     await revalidate()
   }
 
-  const saveProduct = async (product: any) => {
-    await supabaseAdmin.from('products').update({
-      name: product.name,
-      brand: product.brand,
-      category: product.category,
-      price: product.price,
-      old_price: product.old_price || null,
-      badge: product.badge || null,
-      description: product.description || null,
-      published: product.published,
-      featured: product.featured,
-      in_stock: product.in_stock,
-    }).eq('id', product.id)
-    setProducts(prev => prev.map(p => p.id === product.id ? { ...p, ...product } : p))
-    await revalidate()
-    setEditProduct(null)
-  }
-
   // ─── Blog ────────────────────────────────────────────────────────────────────
   const loadPosts = async () => {
     setBlogLoading(true)
     const { data } = await supabaseAdmin.from('posts').select('*').order('created_at', { ascending: false })
     setPosts(data || [])
     setBlogLoading(false)
-  }
-
-  const revalidate = async () => {
-    await fetch('/api/revalidate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).catch(() => {})
   }
 
   const savePost = async (post: any) => {
@@ -143,8 +138,32 @@ export default function AdminPage() {
     loadPosts()
   }
 
+  // ─── Settings ────────────────────────────────────────────────────────────────
+  const loadSettings = async () => {
+    setSettingsLoading(true)
+    const { data } = await supabaseAdmin.from('settings').select('key, value')
+    if (data) setSettings(Object.fromEntries(data.map(({ key, value }) => [key, value])))
+    setSettingsLoading(false)
+  }
+
+  const saveSetting = async (key: string, value: any) => {
+    setSaving(key)
+    await supabaseAdmin.from('settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    setSettings(prev => ({ ...prev, [key]: value }))
+    await revalidate()
+    setSaving(null)
+    setSaved(key)
+    setTimeout(() => setSaved(null), 2000)
+  }
+
+  const us = (key: string, field: string, val: any) => {
+    setSettings(prev => ({ ...prev, [key]: { ...(prev[key] || {}), [field]: val } }))
+  }
+
+  // ─── Effects ─────────────────────────────────────────────────────────────────
   useEffect(() => { if (auth && tab === 'produits') loadProducts('', 0, prodFilter) }, [tab, auth])
   useEffect(() => { if (auth && tab === 'blog') loadPosts() }, [tab, auth])
+  useEffect(() => { if (auth && (tab === 'contenu' || tab === 'seo')) loadSettings() }, [tab, auth])
 
   const stats = {
     total: orders.length,
@@ -153,6 +172,14 @@ export default function AdminPage() {
     revenue: orders.filter(o => o.status !== 'cancelled').reduce((s, o) => s + (o.total || 0), 0),
   }
   const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter)
+
+  const tabs = [
+    { key: 'commandes', label: 'Commandes', icon: ShoppingBag },
+    { key: 'produits',  label: 'Produits',  icon: Package },
+    { key: 'blog',      label: 'Blog',       icon: BookOpen },
+    { key: 'contenu',   label: 'Contenu',    icon: Layout },
+    { key: 'seo',       label: 'SEO',        icon: Globe },
+  ]
 
   // ─── Login ───────────────────────────────────────────────────────────────────
   if (!auth) return (
@@ -183,21 +210,17 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-charcoal-dark text-white px-6 py-4 sticky top-0 z-40">
+      <div className="bg-charcoal-dark text-white px-6 py-3 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="font-serif text-xl font-light">Mobikit <span className="text-gold text-sm">Admin</span></div>
-          <div className="flex items-center gap-1">
-            {[
-              { key: 'commandes', label: 'Commandes', icon: ShoppingBag },
-              { key: 'produits',  label: 'Produits',  icon: Package },
-              { key: 'blog',      label: 'Blog',       icon: BookOpen },
-            ].map(({ key, label, icon: Icon }) => (
-              <button key={key} onClick={() => setTab(key as any)}
-                className={`flex items-center gap-1.5 px-4 py-2 text-xs rounded transition-colors ${tab === key ? 'bg-gold text-white' : 'text-gray-400 hover:text-white'}`}>
-                <Icon size={13} /> {label}
+          <div className="font-serif text-lg font-light">Mobikit <span className="text-gold text-xs">Admin</span></div>
+          <div className="flex items-center gap-0.5 flex-wrap">
+            {tabs.map(({ key, label, icon: Icon }) => (
+              <button key={key} onClick={() => setTab(key as Tab)}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs rounded transition-colors ${tab === key ? 'bg-gold text-white' : 'text-gray-400 hover:text-white'}`}>
+                <Icon size={12} /> {label}
               </button>
             ))}
-            <button onClick={() => setAuth(false)} className="ml-3 text-xs text-gray-400 hover:text-white">Déconnexion</button>
+            <button onClick={() => setAuth(false)} className="ml-2 text-xs text-gray-500 hover:text-white border border-gray-600 px-3 py-1.5 rounded">Déconnexion</button>
           </div>
         </div>
       </div>
@@ -214,8 +237,8 @@ export default function AdminPage() {
                 { label: 'Livrées', value: stats.delivered, icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' },
                 { label: "Chiffre d'affaires", value: `${stats.revenue.toLocaleString('fr-MA')} MAD`, icon: TrendingUp, color: 'text-gold', bg: 'bg-amber-50' },
               ].map(s => (
-                <div key={s.label} className="bg-white border border-gray-100 p-5 rounded">
-                  <div className={`w-10 h-10 ${s.bg} rounded flex items-center justify-center mb-3`}>
+                <div key={s.label} className="bg-white border border-gray-100 p-5 rounded-lg">
+                  <div className={`w-10 h-10 ${s.bg} rounded-lg flex items-center justify-center mb-3`}>
                     <s.icon size={20} className={s.color} />
                   </div>
                   <div className="text-2xl font-serif font-light text-charcoal">{s.value}</div>
@@ -225,7 +248,7 @@ export default function AdminPage() {
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 bg-white border border-gray-100 rounded">
+              <div className="lg:col-span-2 bg-white border border-gray-100 rounded-lg">
                 <div className="p-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
                   <h2 className="font-medium text-charcoal flex items-center gap-2"><ShoppingBag size={16} className="text-gold" /> Commandes</h2>
                   <div className="flex gap-1 flex-wrap">
@@ -253,7 +276,6 @@ export default function AdminPage() {
                                 <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium ${sc.color}`}>{sc.label}</span>
                               </div>
                               <p className="text-xs text-charcoal-light">{order.customer?.prenom} {order.customer?.nom} · {order.customer?.ville}</p>
-                              <p className="text-[10px] text-charcoal-light">{order.payment_method === 'online' ? 'CMI' : 'Livraison'}</p>
                             </div>
                             <div className="text-right">
                               <p className="text-sm font-medium">{order.total?.toLocaleString('fr-MA')} MAD</p>
@@ -269,13 +291,13 @@ export default function AdminPage() {
 
               <div>
                 {selected ? (
-                  <div className="bg-white border border-gray-100 rounded sticky top-24 p-4 space-y-4">
+                  <div className="bg-white border border-gray-100 rounded-lg sticky top-24 p-4 space-y-4">
                     <div className="flex justify-between items-start">
                       <p className="text-xs font-medium">{selected.order_id}</p>
                       <button onClick={() => setSelected(null)} className="text-charcoal-light text-lg">×</button>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-widest text-charcoal-light mb-2">Statut</p>
+                      <p className="text-[10px] uppercase tracking-widests text-charcoal-light mb-2">Statut</p>
                       <select value={selected.status} onChange={e => updateStatus(selected.id, e.target.value)} disabled={updating}
                         className="w-full border border-gray-200 px-3 py-2 text-xs focus:outline-none focus:border-gold rounded">
                         {Object.entries(statusConfig).map(([v, c]) => <option key={v} value={v}>{c.label}</option>)}
@@ -301,7 +323,7 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-white border border-gray-100 rounded p-8 text-center text-charcoal-light">
+                  <div className="bg-white border border-gray-100 rounded-lg p-8 text-center text-charcoal-light">
                     <Package size={32} className="mx-auto mb-3 opacity-30" />
                     <p className="text-sm">Sélectionnez une commande</p>
                   </div>
@@ -313,15 +335,13 @@ export default function AdminPage() {
 
         {/* ── PRODUITS ──────────────────────────────────────────────── */}
         {tab === 'produits' && (
-          <div className="bg-white border border-gray-100 rounded">
-            {/* Header */}
+          <div className="bg-white border border-gray-100 rounded-lg">
             <div className="p-4 border-b flex flex-col gap-3">
               <div className="flex items-center justify-between flex-wrap gap-3">
                 <h2 className="font-medium text-charcoal flex items-center gap-2"><Package size={16} className="text-gold" /> Produits</h2>
                 <p className="text-xs text-charcoal-light">{prodTotal.toLocaleString()} produit(s) · page {prodPage + 1}/{Math.ceil(prodTotal / PAGE_SIZE) || 1}</p>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                {/* Filtre statut */}
                 <div className="flex gap-1">
                   {([['all','Tous'],['published','Publiés'],['hidden','Masqués']] as const).map(([v, l]) => (
                     <button key={v} onClick={() => { setProdFilter(v); loadProducts(search, 0, v) }}
@@ -330,7 +350,6 @@ export default function AdminPage() {
                     </button>
                   ))}
                 </div>
-                {/* Recherche */}
                 <div className="flex items-center gap-2 flex-1 min-w-[200px]">
                   <div className="relative flex-1">
                     <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
@@ -344,84 +363,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Formulaire édition produit */}
-            {editProduct && (
-              <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
-                  <div className="p-5 border-b flex items-center justify-between sticky top-0 bg-white">
-                    <h3 className="font-medium text-charcoal">Modifier le produit</h3>
-                    <button onClick={() => setEditProduct(null)} className="text-charcoal-light hover:text-charcoal text-xl">×</button>
-                  </div>
-                  <div className="p-5 space-y-4">
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-charcoal-light mb-1.5">Nom</label>
-                      <input value={editProduct.name || ''} onChange={e => setEditProduct((p: any) => ({ ...p, name: e.target.value }))}
-                        className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Marque</label>
-                        <input value={editProduct.brand || ''} onChange={e => setEditProduct((p: any) => ({ ...p, brand: e.target.value }))}
-                          className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded" />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Catégorie</label>
-                        <select value={editProduct.category || ''} onChange={e => setEditProduct((p: any) => ({ ...p, category: e.target.value }))}
-                          className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded">
-                          {['linge-de-lit','linge-de-table','linge-de-bain','senteurs-bougies','esteban-parfums','literie','mobilier','decoration','pyjama-homewear','accessoires-sdb'].map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Prix (MAD)</label>
-                        <input type="number" value={editProduct.price || 0} onChange={e => setEditProduct((p: any) => ({ ...p, price: parseFloat(e.target.value) }))}
-                          className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded" />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Ancien prix (MAD)</label>
-                        <input type="number" value={editProduct.old_price || ''} onChange={e => setEditProduct((p: any) => ({ ...p, old_price: e.target.value ? parseFloat(e.target.value) : null }))}
-                          placeholder="Optionnel"
-                          className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Badge</label>
-                      <select value={editProduct.badge || ''} onChange={e => setEditProduct((p: any) => ({ ...p, badge: e.target.value || null }))}
-                        className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded">
-                        <option value="">Aucun</option>
-                        {['Nouveau','Bestseller','Exclusif','Promo','Premium'].map(b => <option key={b}>{b}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Description</label>
-                      <textarea value={editProduct.description || ''} onChange={e => setEditProduct((p: any) => ({ ...p, description: e.target.value }))}
-                        rows={3} className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded resize-none" />
-                    </div>
-                    <div className="flex gap-6">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={editProduct.published || false} onChange={e => setEditProduct((p: any) => ({ ...p, published: e.target.checked }))} className="w-4 h-4 accent-gold" />
-                        <span className="text-sm">Visible sur le site</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={editProduct.featured || false} onChange={e => setEditProduct((p: any) => ({ ...p, featured: e.target.checked }))} className="w-4 h-4 accent-gold" />
-                        <span className="text-sm">Mis en avant (accueil)</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={editProduct.in_stock !== false} onChange={e => setEditProduct((p: any) => ({ ...p, in_stock: e.target.checked }))} className="w-4 h-4 accent-gold" />
-                        <span className="text-sm">En stock</span>
-                      </label>
-                    </div>
-                  </div>
-                  <div className="p-5 border-t flex justify-end gap-3 sticky bottom-0 bg-white">
-                    <button onClick={() => setEditProduct(null)} className="text-xs px-4 py-2 border border-gray-200 rounded hover:bg-gray-50">Annuler</button>
-                    <button onClick={() => saveProduct(editProduct)} className="text-xs bg-gold text-white px-5 py-2 rounded hover:bg-gold-dark">Enregistrer</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Liste */}
             {prodLoading ? (
               <div className="p-12 text-center text-sm text-charcoal-light">Chargement...</div>
             ) : products.length === 0 ? (
@@ -429,42 +370,37 @@ export default function AdminPage() {
             ) : (
               <div className="divide-y divide-gray-50">
                 {products.map(p => (
-                  <div key={p.id} className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 cursor-pointer group"
-                    onClick={() => setEditProduct({ ...p })}>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-charcoal truncate group-hover:text-gold transition-colors">{p.name?.replace(/^[\s?!#@*]+/, '')}</p>
-                      <p className="text-[10px] text-charcoal-light">{p.brand} · {p.category} · {p.price?.toLocaleString('fr-MA')} MAD</p>
+                  <div key={p.id} className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 group">
+                    <div className="flex-1 min-w-0 cursor-pointer" onClick={() => router.push(`/admin/produit/${p.id}`)}>
+                      <p className="text-xs font-medium text-charcoal truncate group-hover:text-gold transition-colors">{p.name?.replace(/^[\s?!"#@*]+/, '')}</p>
+                      <p className="text-[10px] text-charcoal-light">{p.brand || '—'} · {p.category} · {p.price?.toLocaleString('fr-MA')} MAD</p>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <button onClick={() => toggleProduct(p.id, 'featured', !p.featured)}
-                        className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded transition-colors ${p.featured ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-400'}`}>
+                        className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded transition-colors ${p.featured ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-400 hover:bg-amber-50'}`}>
                         <Star size={11} /> Vedette
                       </button>
                       <button onClick={() => toggleProduct(p.id, 'published', !p.published)}
-                        className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded transition-colors ${p.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'}`}>
+                        className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded transition-colors ${p.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400 hover:bg-green-50'}`}>
                         {p.published ? <><Globe size={11} /> Publié</> : <><GlobeLock size={11} /> Masqué</>}
                       </button>
-                      <Edit3 size={13} className="text-charcoal-light group-hover:text-gold transition-colors" />
+                      <button onClick={() => router.push(`/admin/produit/${p.id}`)}
+                        className="flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-gold/10 text-gold hover:bg-gold hover:text-white transition-colors">
+                        <Edit3 size={11} /> Éditer
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
             )}
 
-            {/* Pagination */}
             {prodTotal > PAGE_SIZE && (
               <div className="p-4 border-t flex items-center justify-between">
                 <button onClick={() => loadProducts(search, prodPage - 1)} disabled={prodPage === 0}
-                  className="text-xs px-4 py-2 border border-gray-200 rounded disabled:opacity-30 hover:bg-gray-50 disabled:cursor-not-allowed">
-                  ← Précédent
-                </button>
-                <p className="text-xs text-charcoal-light">
-                  {prodPage * PAGE_SIZE + 1}–{Math.min((prodPage + 1) * PAGE_SIZE, prodTotal)} sur {prodTotal.toLocaleString()}
-                </p>
+                  className="text-xs px-4 py-2 border border-gray-200 rounded disabled:opacity-30 hover:bg-gray-50 disabled:cursor-not-allowed">← Précédent</button>
+                <p className="text-xs text-charcoal-light">{prodPage * PAGE_SIZE + 1}–{Math.min((prodPage + 1) * PAGE_SIZE, prodTotal)} sur {prodTotal.toLocaleString()}</p>
                 <button onClick={() => loadProducts(search, prodPage + 1)} disabled={(prodPage + 1) * PAGE_SIZE >= prodTotal}
-                  className="text-xs px-4 py-2 border border-gray-200 rounded disabled:opacity-30 hover:bg-gray-50 disabled:cursor-not-allowed">
-                  Suivant →
-                </button>
+                  className="text-xs px-4 py-2 border border-gray-200 rounded disabled:opacity-30 hover:bg-gray-50 disabled:cursor-not-allowed">Suivant →</button>
               </div>
             )}
           </div>
@@ -480,7 +416,7 @@ export default function AdminPage() {
                 onCancel={() => { setEditPost(null); setNewPost(false) }}
               />
             ) : (
-              <div className="bg-white border border-gray-100 rounded">
+              <div className="bg-white border border-gray-100 rounded-lg">
                 <div className="p-4 border-b flex items-center justify-between">
                   <h2 className="font-medium flex items-center gap-2"><BookOpen size={16} className="text-gold" /> Articles Blog</h2>
                   <button onClick={() => setNewPost(true)} className="flex items-center gap-1.5 text-xs bg-gold text-white px-4 py-2 rounded hover:bg-gold-dark transition-colors">
@@ -498,16 +434,23 @@ export default function AdminPage() {
                     <div className="divide-y divide-gray-50">
                       {posts.map(post => (
                         <div key={post.id} className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50">
+                          {post.cover_image && (
+                            <div className="w-12 h-12 flex-shrink-0 rounded overflow-hidden bg-cream-dark">
+                              <img src={post.cover_image} alt="" className="w-full h-full object-cover" />
+                            </div>
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium truncate">{post.title}</p>
                             <p className="text-[10px] text-charcoal-light">{post.category} · {new Date(post.created_at).toLocaleDateString('fr-MA')}</p>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-shrink-0">
                             <span className={`text-[9px] px-2 py-0.5 rounded-full ${post.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                               {post.published ? 'Publié' : 'Brouillon'}
                             </span>
-                            <button onClick={() => setEditPost(post)} className="text-charcoal-light hover:text-gold transition-colors"><Edit3 size={14} /></button>
-                            <button onClick={() => deletePost(post.id)} className="text-charcoal-light hover:text-red-500 transition-colors"><Trash2 size={14} /></button>
+                            <button onClick={() => setEditPost(post)} className="flex items-center gap-1 text-[10px] px-2 py-1 rounded bg-gold/10 text-gold hover:bg-gold hover:text-white transition-colors">
+                              <Edit3 size={11} /> Éditer
+                            </button>
+                            <button onClick={() => deletePost(post.id)} className="text-charcoal-light hover:text-red-500 transition-colors p-1"><Trash2 size={14} /></button>
                           </div>
                         </div>
                       ))}
@@ -519,11 +462,246 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* ── CONTENU DU SITE ───────────────────────────────────────── */}
+        {tab === 'contenu' && (
+          settingsLoading ? <div className="p-12 text-center text-charcoal-light">Chargement...</div> : (
+          <div className="space-y-6">
+            <h2 className="font-serif text-xl font-light text-charcoal flex items-center gap-2"><Layout size={18} className="text-gold" /> Contenu du Site</h2>
+
+            {/* ─ Bannière ─ */}
+            <Section title="Bannière d'annonce" icon={<Bell size={15} className="text-gold" />}>
+              <Field label="Texte de la bannière">
+                <input value={settings.banner?.text || ''} onChange={e => us('banner', 'text', e.target.value)}
+                  placeholder="LIVRAISON GRATUITE À CASABLANCA DÈS 500DH"
+                  className="input-admin" />
+              </Field>
+              <div className="flex items-center gap-3">
+                <Toggle checked={settings.banner?.active !== false} onChange={v => us('banner', 'active', v)} />
+                <span className="text-sm text-charcoal">Bannière active</span>
+              </div>
+              <SaveBtn keyName="banner" value={settings.banner} onSave={saveSetting} saving={saving} saved={saved} />
+            </Section>
+
+            {/* ─ Hero Homepage ─ */}
+            <Section title="Hero — Page d'accueil" icon={<ImageIcon size={15} className="text-gold" />}>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Field label="Titre principal">
+                  <input value={settings.hero?.title || ''} onChange={e => us('hero', 'title', e.target.value)}
+                    placeholder="L'Art de Vivre" className="input-admin" />
+                </Field>
+                <Field label="Sous-titre (italique doré)">
+                  <input value={settings.hero?.subtitle || ''} onChange={e => us('hero', 'subtitle', e.target.value)}
+                    placeholder="à la Française" className="input-admin" />
+                </Field>
+                <Field label="Description" className="md:col-span-2">
+                  <textarea value={settings.hero?.description || ''} onChange={e => us('hero', 'description', e.target.value)}
+                    rows={2} className="input-admin resize-none" placeholder="Linge de maison, literie et décoration haut de gamme..." />
+                </Field>
+                <Field label="Texte bouton principal">
+                  <input value={settings.hero?.cta_text || ''} onChange={e => us('hero', 'cta_text', e.target.value)}
+                    placeholder="Découvrir la Boutique" className="input-admin" />
+                </Field>
+                <Field label="Lien bouton">
+                  <input value={settings.hero?.cta_url || ''} onChange={e => us('hero', 'cta_url', e.target.value)}
+                    placeholder="/boutique" className="input-admin" />
+                </Field>
+              </div>
+              <SaveBtn keyName="hero" value={settings.hero} onSave={saveSetting} saving={saving} saved={saved} />
+            </Section>
+
+            {/* ─ Contact ─ */}
+            <Section title="Informations de contact" icon={<Phone size={15} className="text-gold" />}>
+              <div className="grid md:grid-cols-2 gap-4">
+                <Field label="Téléphone">
+                  <div className="relative">
+                    <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
+                    <input value={settings.contact?.phone || ''} onChange={e => us('contact', 'phone', e.target.value)}
+                      placeholder="+212 666-427890" className="input-admin pl-8" />
+                  </div>
+                </Field>
+                <Field label="WhatsApp">
+                  <div className="relative">
+                    <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
+                    <input value={settings.contact?.whatsapp || ''} onChange={e => us('contact', 'whatsapp', e.target.value)}
+                      placeholder="+212666427890" className="input-admin pl-8" />
+                  </div>
+                </Field>
+                <Field label="Email">
+                  <div className="relative">
+                    <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
+                    <input value={settings.contact?.email || ''} onChange={e => us('contact', 'email', e.target.value)}
+                      placeholder="contact@mobikit.ma" className="input-admin pl-8" />
+                  </div>
+                </Field>
+                <Field label="Adresse">
+                  <div className="relative">
+                    <MapPin size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
+                    <input value={settings.contact?.address || ''} onChange={e => us('contact', 'address', e.target.value)}
+                      placeholder="Casablanca, Maroc" className="input-admin pl-8" />
+                  </div>
+                </Field>
+              </div>
+              <SaveBtn keyName="contact" value={settings.contact} onSave={saveSetting} saving={saving} saved={saved} />
+            </Section>
+
+            {/* ─ Réseaux Sociaux ─ */}
+            <Section title="Réseaux Sociaux" icon={<Instagram size={15} className="text-gold" />}>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { key: 'instagram', label: 'Instagram', ph: 'https://instagram.com/mobikit.ma' },
+                  { key: 'facebook',  label: 'Facebook',  ph: 'https://facebook.com/mobikit.ma' },
+                  { key: 'pinterest', label: 'Pinterest', ph: 'https://pinterest.com/mobikit' },
+                  { key: 'tiktok',    label: 'TikTok',    ph: 'https://tiktok.com/@mobikit' },
+                  { key: 'linkedin',  label: 'LinkedIn',  ph: 'https://linkedin.com/company/mobikit' },
+                ].map(({ key, label, ph }) => (
+                  <Field key={key} label={label}>
+                    <input value={settings.social?.[key] || ''} onChange={e => us('social', key, e.target.value)}
+                      placeholder={ph} className="input-admin" />
+                  </Field>
+                ))}
+              </div>
+              <SaveBtn keyName="social" value={settings.social} onSave={saveSetting} saving={saving} saved={saved} />
+            </Section>
+          </div>
+          )
+        )}
+
+        {/* ── SEO ───────────────────────────────────────────────────── */}
+        {tab === 'seo' && (
+          settingsLoading ? <div className="p-12 text-center text-charcoal-light">Chargement...</div> : (
+          <div className="space-y-6">
+            <h2 className="font-serif text-xl font-light text-charcoal flex items-center gap-2"><Globe size={18} className="text-gold" /> Référencement (SEO)</h2>
+
+            {/* ─ SEO Global ─ */}
+            <Section title="SEO Global" icon={<Globe size={15} className="text-gold" />}>
+              <div className="space-y-4">
+                <Field label="Nom du site">
+                  <input value={settings.seo_global?.site_name || ''} onChange={e => us('seo_global', 'site_name', e.target.value)}
+                    placeholder="Mobikit Home Collections" className="input-admin" />
+                </Field>
+                <Field label="Description par défaut (160 car. max)">
+                  <textarea value={settings.seo_global?.default_description || ''} onChange={e => us('seo_global', 'default_description', e.target.value)}
+                    rows={3} className="input-admin resize-none"
+                    placeholder="Distributeur officiel de linge de maison haut de gamme au Maroc." />
+                  <p className="text-[10px] text-charcoal-light mt-1">{(settings.seo_global?.default_description || '').length}/160 caractères</p>
+                </Field>
+                <Field label="Image OG (partagée sur réseaux sociaux)">
+                  <input value={settings.seo_global?.og_image || ''} onChange={e => us('seo_global', 'og_image', e.target.value)}
+                    placeholder="/images/showroom-mobikit.webp" className="input-admin" />
+                  {settings.seo_global?.og_image && (
+                    <div className="mt-2 rounded overflow-hidden h-32 bg-gray-100">
+                      <img src={settings.seo_global.og_image} alt="OG" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </Field>
+              </div>
+
+              {/* Aperçu Google */}
+              <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4">
+                <p className="text-[10px] uppercase tracking-widests text-charcoal-light mb-3 font-medium">Aperçu Google</p>
+                <p className="text-blue-600 text-sm font-medium">{settings.seo_global?.site_name || 'Mobikit Home Collections'} | Linge de Maison au Maroc</p>
+                <p className="text-green-700 text-xs">mobikit.ma</p>
+                <p className="text-charcoal-light text-xs mt-1 leading-relaxed">{settings.seo_global?.default_description || 'Aucune description...'}</p>
+              </div>
+
+              <SaveBtn keyName="seo_global" value={settings.seo_global} onSave={saveSetting} saving={saving} saved={saved} />
+            </Section>
+
+            {/* ─ SEO par Page ─ */}
+            <Section title="SEO par Page" icon={<Tag size={15} className="text-gold" />}>
+              <div className="space-y-4">
+                <p className="text-xs text-charcoal-light">Pour les pages produit et blog, le SEO est géré directement depuis l&apos;éditeur de chaque contenu.</p>
+                {[
+                  { key: 'seo_homepage', label: 'Page d\'Accueil', url: '/' },
+                  { key: 'seo_boutique', label: 'Boutique', url: '/boutique' },
+                  { key: 'seo_marques',  label: 'Nos Marques', url: '/marques' },
+                  { key: 'seo_blog',     label: 'Blog', url: '/blog' },
+                  { key: 'seo_showroom', label: 'Showroom', url: '/showroom' },
+                  { key: 'seo_contact',  label: 'Contact', url: '/contact' },
+                ].map(({ key, label, url }) => (
+                  <div key={key} className="border border-gray-100 rounded-lg p-4 bg-gray-50">
+                    <div className="flex items-center gap-2 mb-3">
+                      <ChevronRight size={14} className="text-gold" />
+                      <p className="text-sm font-medium text-charcoal">{label}</p>
+                      <span className="text-[10px] text-charcoal-light bg-gray-200 px-2 py-0.5 rounded">{url}</span>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <Field label="Titre SEO (60 car. max)">
+                        <input value={settings[key]?.title || ''} onChange={e => us(key, 'title', e.target.value)}
+                          placeholder={`${label} | Mobikit`} className="input-admin text-xs" />
+                        <p className="text-[10px] text-charcoal-light mt-0.5">{(settings[key]?.title || '').length}/60</p>
+                      </Field>
+                      <Field label="Méta description (160 car. max)">
+                        <input value={settings[key]?.description || ''} onChange={e => us(key, 'description', e.target.value)}
+                          placeholder="Description pour Google..." className="input-admin text-xs" />
+                        <p className="text-[10px] text-charcoal-light mt-0.5">{(settings[key]?.description || '').length}/160</p>
+                      </Field>
+                    </div>
+                    <div className="mt-2 flex justify-end">
+                      <SaveBtn keyName={key} value={settings[key]} onSave={saveSetting} saving={saving} saved={saved} small />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          </div>
+          )
+        )}
+
       </div>
     </div>
   )
 }
 
+// ─── Composants utilitaires ───────────────────────────────────────────────────
+
+function Section({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="bg-white border border-gray-100 rounded-lg overflow-hidden">
+      <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50">
+        {icon}
+        <h3 className="text-sm font-medium text-charcoal">{title}</h3>
+      </div>
+      <div className="p-5 space-y-4">{children}</div>
+    </div>
+  )
+}
+
+function Field({ label, children, className = '' }: { label: string; children: React.ReactNode; className?: string }) {
+  return (
+    <div className={className}>
+      <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5 font-medium">{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <div onClick={() => onChange(!checked)}
+      className={`w-10 h-5 rounded-full transition-colors relative cursor-pointer ${checked ? 'bg-green-500' : 'bg-gray-300'}`}>
+      <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
+    </div>
+  )
+}
+
+function SaveBtn({ keyName, value, onSave, saving, saved, small = false }: {
+  keyName: string; value: any; onSave: (k: string, v: any) => void; saving: string | null; saved: string | null; small?: boolean
+}) {
+  const isSaving = saving === keyName
+  const isSaved  = saved === keyName
+  return (
+    <button onClick={() => onSave(keyName, value)} disabled={isSaving}
+      className={`flex items-center gap-1.5 ${small ? 'text-[10px] px-3 py-1.5' : 'text-xs px-5 py-2'} rounded font-medium transition-colors ${
+        isSaved ? 'bg-green-600 text-white' : isSaving ? 'bg-gold/60 text-white cursor-wait' : 'bg-gold text-white hover:bg-gold-dark'
+      }`}>
+      <Save size={small ? 10 : 13} />
+      {isSaving ? 'Enregistrement...' : isSaved ? '✓ Enregistré !' : 'Enregistrer'}
+    </button>
+  )
+}
+
+// ─── ImageUploader ────────────────────────────────────────────────────────────
 function ImageUploader({ value, onChange }: { value: string; onChange: (url: string) => void }) {
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -533,10 +711,7 @@ function ImageUploader({ value, onChange }: { value: string; onChange: (url: str
     setUploading(true)
     const ext = file.name.split('.').pop()
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const client = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlb3l5bXdla2p2dHpncGN0dnF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDg0MjM3MywiZXhwIjoyMDk2NDE4MzczfQ.cI3Ww0KU8a6z5JOpvOgTozrnE3PyscELUAc-FZLpzOM'
-    )
+    const client = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlb3l5bXdla2p2dHpncGN0dnF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDg0MjM3MywiZXhwIjoyMDk2NDE4MzczfQ.cI3Ww0KU8a6z5JOpvOgTozrnE3PyscELUAc-FZLpzOM')
     const { error } = await client.storage.from('blog-images').upload(filename, file)
     if (!error) {
       const { data } = client.storage.from('blog-images').getPublicUrl(filename)
@@ -566,7 +741,7 @@ function ImageUploader({ value, onChange }: { value: string; onChange: (url: str
             {uploading ? (
               <><div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin" /><p className="text-xs">Upload en cours...</p></>
             ) : (
-              <><div className="text-4xl">📷</div><p className="text-sm font-medium text-charcoal">Glisser une image ici</p><p className="text-xs">ou cliquer pour parcourir · JPG, PNG, WEBP</p></>
+              <><div className="text-4xl">📷</div><p className="text-sm font-medium text-charcoal">Glisser une image ici</p><p className="text-xs">ou cliquer pour parcourir</p></>
             )}
           </div>
         )}
@@ -580,41 +755,55 @@ function ImageUploader({ value, onChange }: { value: string; onChange: (url: str
   )
 }
 
+// ─── PostForm ─────────────────────────────────────────────────────────────────
 function PostForm({ post, onSave, onCancel }: { post: any; onSave: (p: any) => void; onCancel: () => void }) {
   const [form, setForm] = useState(post)
   const u = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }))
   return (
-    <div className="bg-white border border-gray-100 rounded p-6 space-y-4">
+    <div className="bg-white border border-gray-100 rounded-lg p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-medium text-charcoal">{form.id ? 'Modifier l\'article' : 'Nouvel article'}</h2>
+        <h2 className="font-medium text-charcoal">{form.id ? "Modifier l'article" : 'Nouvel article'}</h2>
         <button onClick={onCancel} className="text-charcoal-light hover:text-charcoal text-xl leading-none">×</button>
       </div>
       <div className="grid md:grid-cols-2 gap-4">
         <div className="md:col-span-2">
-          <label className="block text-[10px] uppercase tracking-widest text-charcoal-light mb-1.5">Titre *</label>
-          <input value={form.title} onChange={e => u('title', e.target.value)} className="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-gold rounded" />
+          <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Titre *</label>
+          <input value={form.title} onChange={e => u('title', e.target.value)} className="input-admin text-sm" />
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-widest text-charcoal-light mb-1.5">Catégorie</label>
-          <select value={form.category} onChange={e => u('category', e.target.value)} className="w-full border border-gray-200 px-3 py-2.5 text-sm focus:outline-none focus:border-gold rounded">
-            {['Inspirations','Guide d\'Achat','Tendances','Conseils','Nos Marques'].map(c => <option key={c}>{c}</option>)}
+          <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Catégorie</label>
+          <select value={form.category} onChange={e => u('category', e.target.value)} className="input-admin text-sm">
+            {["Inspirations","Guide d'Achat","Tendances","Conseils","Nos Marques"].map(c => <option key={c}>{c}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-[10px] uppercase tracking-widest text-charcoal-light mb-1.5">Temps de lecture</label>
-          <input value={form.read_time || ''} onChange={e => u('read_time', e.target.value)} placeholder="ex: 5 min" className="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-gold rounded" />
+          <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Temps de lecture</label>
+          <input value={form.read_time || ''} onChange={e => u('read_time', e.target.value)} placeholder="ex: 5 min" className="input-admin text-sm" />
         </div>
         <div className="md:col-span-2">
           <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Résumé *</label>
-          <textarea value={form.excerpt || ''} onChange={e => u('excerpt', e.target.value)} rows={2} className="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-gold rounded resize-none" />
+          <textarea value={form.excerpt || ''} onChange={e => u('excerpt', e.target.value)} rows={2} className="input-admin resize-none text-sm" />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Contenu</label>
-          <textarea value={form.content || ''} onChange={e => u('content', e.target.value)} rows={8} className="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-gold rounded resize-none" />
+          <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Contenu (paragraphes séparés par une ligne vide)</label>
+          <textarea value={form.content || ''} onChange={e => u('content', e.target.value)} rows={10} className="input-admin resize-none text-sm font-mono" />
         </div>
         <div className="md:col-span-2">
           <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-1.5">Image de couverture</label>
           <ImageUploader value={form.cover_image || ''} onChange={v => u('cover_image', v)} />
+        </div>
+        <div className="md:col-span-2 border-t pt-4">
+          <label className="block text-[10px] uppercase tracking-widests text-charcoal-light mb-2">SEO</label>
+          <div className="grid md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[10px] text-charcoal-light mb-1">Titre SEO (60 car.)</label>
+              <input value={form.seo_title || ''} onChange={e => u('seo_title', e.target.value)} placeholder={form.title} className="input-admin text-xs" />
+            </div>
+            <div>
+              <label className="block text-[10px] text-charcoal-light mb-1">Méta description (160 car.)</label>
+              <input value={form.seo_description || ''} onChange={e => u('seo_description', e.target.value)} placeholder={form.excerpt} className="input-admin text-xs" />
+            </div>
+          </div>
         </div>
       </div>
       <div className="flex items-center justify-between pt-2">
@@ -624,7 +813,7 @@ function PostForm({ post, onSave, onCancel }: { post: any; onSave: (p: any) => v
         </label>
         <div className="flex gap-3">
           <button onClick={onCancel} className="text-xs px-4 py-2 border border-gray-200 rounded hover:bg-gray-50">Annuler</button>
-          <button onClick={() => onSave(form)} className="text-xs bg-gold text-white px-5 py-2 rounded hover:bg-gold-dark">Enregistrer</button>
+          <button onClick={() => onSave(form)} className="text-xs bg-gold text-white px-5 py-2 rounded hover:bg-gold-dark flex items-center gap-1.5"><Save size={12} /> Enregistrer</button>
         </div>
       </div>
     </div>

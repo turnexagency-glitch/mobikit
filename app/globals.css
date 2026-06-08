@@ -30,6 +30,10 @@ body {
 }
 
 @layer components {
+  .input-admin {
+    @apply w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-gold rounded-lg bg-white transition-colors;
+  }
+
   .btn-primary {
     @apply inline-block bg-charcoal text-white px-8 py-3 text-xs tracking-widest uppercase font-medium hover:bg-gold transition-colors duration-300;
   }
