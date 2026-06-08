@@ -39,7 +39,7 @@ const categories = [
     name: 'Literie de Luxe',
     description: 'Matelas, couettes & oreillers',
     href: '/boutique/literie',
-    image: '/categories/accessoires-salle-de-Bain.webp',
+    image: '/categories/literie-de-luxe.webp',
     fallback: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
   },
   {
