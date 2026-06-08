@@ -68,6 +68,10 @@ export default function ProductEditPage() {
 
   const u = (key: string, val: any) => setProduct((p: any) => ({ ...p, [key]: val }))
 
+  const revalidate = async () => {
+    await fetch('/api/revalidate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).catch(() => {})
+  }
+
   const save = async () => {
     setSaving(true)
     await supabaseAdmin.from('products').update({
@@ -88,6 +92,7 @@ export default function ProductEditPage() {
       seo_title: product.seo_title || null,
       seo_description: product.seo_description || null,
     }).eq('id', product.id)
+    await revalidate()
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)

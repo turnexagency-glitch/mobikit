@@ -93,6 +93,7 @@ export default function AdminPage() {
   const toggleProduct = async (id: string, field: 'published' | 'featured', val: boolean) => {
     await supabaseAdmin.from('products').update({ [field]: val }).eq('id', id)
     setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: val } : p))
+    await revalidate()
   }
 
   const saveProduct = async (product: any) => {
@@ -109,6 +110,7 @@ export default function AdminPage() {
       in_stock: product.in_stock,
     }).eq('id', product.id)
     setProducts(prev => prev.map(p => p.id === product.id ? { ...p, ...product } : p))
+    await revalidate()
     setEditProduct(null)
   }
 
@@ -120,18 +122,24 @@ export default function AdminPage() {
     setBlogLoading(false)
   }
 
+  const revalidate = async () => {
+    await fetch('/api/revalidate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).catch(() => {})
+  }
+
   const savePost = async (post: any) => {
     if (post.id) {
       await supabaseAdmin.from('posts').update({ ...post, updated_at: new Date().toISOString() }).eq('id', post.id)
     } else {
       await supabaseAdmin.from('posts').insert({ ...post, created_at: new Date().toISOString() })
     }
+    await revalidate()
     setEditPost(null); setNewPost(false); loadPosts()
   }
 
   const deletePost = async (id: string) => {
     if (!confirm('Supprimer cet article ?')) return
     await supabaseAdmin.from('posts').delete().eq('id', id)
+    await revalidate()
     loadPosts()
   }
 
