@@ -213,12 +213,13 @@ export async function POST(req: NextRequest) {
       }),
     ])
 
+    // L'ordre est déjà sauvé — on retourne succès même si l'email échoue
     if (clientResult.error || adminResult.error) {
-      console.error('Resend error:', clientResult.error || adminResult.error)
-      return NextResponse.json({ error: 'Email error' }, { status: 500 })
+      console.error('Resend email error (order saved):', clientResult.error || adminResult.error)
+      return NextResponse.json({ success: true, orderId, emailSent: false })
     }
 
-    return NextResponse.json({ success: true, orderId })
+    return NextResponse.json({ success: true, orderId, emailSent: true })
   } catch (err) {
     console.error('API error:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
