@@ -170,7 +170,7 @@ export default function ProductEditPage() {
             </button>
             <button onClick={() => u('featured', !product.featured)}
               className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded transition-colors ${product.featured ? 'bg-amber-500 text-white' : 'bg-gray-600 text-gray-300'}`}>
-              <Star size={12} /> {product.featured ? 'Vedette' : 'Non vedette'}
+              <Star size={12} /> {product.featured ? 'Mis en avant' : 'Non mis en avant'}
             </button>
             <button onClick={save} disabled={saving}
               className={`flex items-center gap-2 px-5 py-2 text-sm font-medium rounded transition-colors ${saving ? 'bg-gold/60 cursor-wait' : saved ? 'bg-green-600' : 'bg-gold hover:bg-gold-dark'} text-white`}>

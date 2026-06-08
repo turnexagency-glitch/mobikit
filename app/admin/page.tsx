@@ -378,7 +378,7 @@ export default function AdminPage() {
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <button onClick={() => toggleProduct(p.id, 'featured', !p.featured)}
                         className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded transition-colors ${p.featured ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-400 hover:bg-amber-50'}`}>
-                        <Star size={11} /> Vedette
+                        <Star size={11} /> Accueil
                       </button>
                       <button onClick={() => toggleProduct(p.id, 'published', !p.published)}
                         className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded transition-colors ${p.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400 hover:bg-green-50'}`}>
