@@ -34,8 +34,8 @@ export default function AProposPage() {
       {/* Hero */}
       <section className="relative h-80 flex items-center justify-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1920&q=80"
-          alt="Mobikit"
+          src="/images/showroom-mobikit.webp"
+          alt="Mobikit Showroom"
           fill
           className="object-cover"
         />
@@ -69,10 +69,10 @@ export default function AProposPage() {
             <div className="relative">
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative aspect-[3/4] overflow-hidden">
-                  <Image src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=400&q=80" alt="Mobikit" fill className="object-cover" />
+                  <Image src="/images/showroom-descamps-facade.webp" alt="Mobikit Showroom Descamps" fill className="object-cover" />
                 </div>
                 <div className="relative aspect-[3/4] overflow-hidden mt-8">
-                  <Image src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80" alt="Mobikit" fill className="object-cover" />
+                  <Image src="/images/showroom-linge.webp" alt="Mobikit Collections" fill className="object-cover" />
                 </div>
               </div>
               <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-gold text-white px-8 py-4 text-center">
