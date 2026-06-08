@@ -29,20 +29,20 @@ const categories = [
 ]
 
 const brands = [
-  { name: 'Descamps',            slug: 'descamps',             logo: '/logos/descamps.png',             w: 160, h: 65, removeBg: true  },
-  { name: 'Le Jacquard Français',slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.png', w: 155, h: 68, removeBg: true  },
-  { name: 'Esteban Parfums',     slug: 'esteban-parfums',      logo: '/logos/esteban.png',              w: 150, h: 62, removeBg: true  },
-  { name: 'Aquanova',            slug: 'aquanova',             logo: '/logos/aquanova.png',             w: 110, h: 50, removeBg: false },
-  { name: 'Blomus',              slug: 'blomus',               logo: '/logos/blomus.png',               w: 140, h: 52, removeBg: true  },
-  { name: 'Cosmic',              slug: 'cosmic',               logo: '/logos/cosmic.png',               w: 90,  h: 40, removeBg: false },
-  { name: 'Pilus',               slug: 'pilus',                logo: '/logos/pilus.png',                w: 130, h: 55, removeBg: true  },
-  { name: 'Brun de Vian-Tiran',  slug: 'brun-de-vian-tiran',   logo: '/logos/bvt.png',                  w: 75,  h: 62, removeBg: false },
-  { name: 'Ilum',                slug: 'ilum',                 logo: '/logos/ilum.png',                 w: 140, h: 60, removeBg: true  },
-  { name: 'Oscar',               slug: 'oscar',                logo: '/logos/oscar.png',                w: 80,  h: 40, removeBg: false },
-  { name: 'Geodesis',            slug: 'geodesis',             logo: '/logos/geodesis.png',             w: 100, h: 40, removeBg: false },
-  { name: 'La Savonnerie Royale',slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.png',    w: 120, h: 58, removeBg: false },
-  { name: 'Treca',               slug: 'treca',                logo: '/logos/treca.png',                w: 140, h: 56, removeBg: true  },
-  { name: 'Vispring',            slug: 'vispring',             logo: '/logos/vispring.png',             w: 150, h: 58, removeBg: true  },
+  { name: 'Descamps',            slug: 'descamps',             logo: '/logos/descamps.webp',             imgH: 68, maxW: 400 },
+  { name: 'Le Jacquard Français',slug: 'le-jacquard-francais', logo: '/logos/le-jacquard-francais.webp', imgH: 68, maxW: 400 },
+  { name: 'Esteban Parfums',     slug: 'esteban-parfums',      logo: '/logos/esteban.webp',              imgH: 68, maxW: 400 },
+  { name: 'Aquanova',            slug: 'aquanova',             logo: '/logos/aquanova.webp',             imgH: 36, maxW: 140 },
+  { name: 'Blomus',              slug: 'blomus',               logo: '/logos/blomus.webp',               imgH: 68, maxW: 400 },
+  { name: 'Cosmic',              slug: 'cosmic',               logo: '/logos/cosmic.webp',               imgH: 68, maxW: 400 },
+  { name: 'Pilus',               slug: 'pilus',                logo: '/logos/pilus.webp',                imgH: 68, maxW: 400 },
+  { name: 'Brun de Vian-Tiran',  slug: 'brun-de-vian-tiran',   logo: '/logos/bvt.webp',                  imgH: 68, maxW: 400 },
+  { name: 'Ilum',                slug: 'ilum',                 logo: '/logos/ilum.webp',                 imgH: 68, maxW: 400 },
+  { name: 'Oscar',               slug: 'oscar',                logo: '/logos/oscar.webp',                imgH: 36, maxW: 200 },
+  { name: 'Geodesis',            slug: 'geodesis',             logo: '/logos/geodesis.webp',             imgH: 36, maxW: 140 },
+  { name: 'La Savonnerie Royale',slug: 'la-savonnerie-royale', logo: '/logos/savonnerie-royale.webp',    imgH: 36, maxW: 160 },
+  { name: 'Treca',               slug: 'treca',                logo: '/logos/treca.webp',                imgH: 68, maxW: 400 },
+  { name: 'Vispring',            slug: 'vispring',             logo: '/logos/vispring.webp',             imgH: 68, maxW: 400 },
 ]
 
 export default function Header() {
@@ -183,35 +183,47 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Brand logos bar */}
-        <div className="hidden lg:block border-t border-b border-cream-dark bg-white">
-          <div className="w-full px-6">
-            <div className="flex items-center justify-between py-4 gap-3">
-              {brands.map(brand => (
-                <Link
-                  key={brand.slug}
-                  href={`/marques/${brand.slug}`}
-                  title={brand.name}
-                  className="flex items-center justify-center group shrink-0 opacity-75 hover:opacity-100 hover:scale-105 transition-all duration-300"
-                >
-                  <Image
-                    src={brand.logo}
-                    alt={brand.name}
-                    width={brand.w}
-                    height={brand.h}
-                    style={{
-                      width: brand.w,
-                      height: brand.h,
-                      objectFit: 'contain',
-                      mixBlendMode: brand.removeBg ? 'multiply' : 'normal',
-                    }}
-                    onError={(e: any) => {
-                      e.currentTarget.style.display = 'none'
-                    }}
-                  />
-                </Link>
-              ))}
-            </div>
+        {/* Brand logos bar — scrolling marquee */}
+        <div className="hidden lg:block bg-[#f5f0e8] overflow-hidden border-t border-[#e8e0d0]" style={{ height: 72 }}>
+          <style>{`
+            @keyframes marquee {
+              0%   { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .marquee-track {
+              display: flex;
+              align-items: center;
+              height: 72px;
+              width: max-content;
+              animation: marquee 35s linear infinite;
+            }
+            .marquee-track:hover { animation-play-state: paused; }
+          `}</style>
+          <div className="marquee-track">
+            {[...brands, ...brands].map((brand, i) => (
+              <Link
+                key={`${brand.slug}-${i}`}
+                href={`/marques/${brand.slug}`}
+                title={brand.name}
+                className="flex items-center justify-center shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-300 border-r border-[#ddd5c5]"
+                style={{ height: 72, padding: '0 24px' }}
+              >
+                <Image
+                  src={brand.logo}
+                  alt={brand.name}
+                  width={500}
+                  height={brand.imgH}
+                  style={{
+                    width: 'auto',
+                    height: brand.imgH,
+                    maxWidth: brand.maxW,
+                    objectFit: 'contain',
+                    mixBlendMode: 'multiply',
+                  }}
+                  onError={(e: any) => { e.currentTarget.style.display = 'none' }}
+                />
+              </Link>
+            ))}
           </div>
         </div>
 

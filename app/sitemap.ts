@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
+import { getAllProducts, getAllPosts } from '@/lib/supabase'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = 'https://www.mobikit.ma'
   const now = new Date()
 
@@ -29,13 +30,35 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'descamps', 'le-jacquard-francais', 'esteban-parfums', 'aquanova',
     'blomus', 'cosmic', 'pilus', 'brun-de-vian-tiran', 'ilum',
     'oscar', 'geodesis', 'la-savonnerie-royale', 'treca', 'vispring',
+    'pyrenex', 'tom-dixon', 'bolia', 'gubi', 'hay',
   ].map(brand => ({
     url: `${base}/marques/${brand}`,
     priority: 0.7,
     changeFrequency: 'weekly' as const,
   }))
 
-  return [...staticPages, ...categories, ...brands].map(page => ({
+  const [products, posts] = await Promise.all([
+    getAllProducts().catch(() => [] as any[]),
+    getAllPosts().catch(() => [] as any[]),
+  ])
+
+  const productPages = products
+    .filter((p: any) => p.slug)
+    .map((p: any) => ({
+      url: `${base}/produit/${p.slug}`,
+      priority: 0.6,
+      changeFrequency: 'weekly' as const,
+    }))
+
+  const postPages = posts
+    .filter((p: any) => p.slug)
+    .map((p: any) => ({
+      url: `${base}/blog/${p.slug}`,
+      priority: 0.5,
+      changeFrequency: 'monthly' as const,
+    }))
+
+  return [...staticPages, ...categories, ...brands, ...productPages, ...postPages].map(page => ({
     ...page,
     lastModified: now,
   }))

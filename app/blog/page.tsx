@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getAllPosts } from '@/lib/sanity'
+import { getAllPosts } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,8 +42,8 @@ export default async function BlogPage() {
                 <Link href={`/blog/${featured.slug}`} className="group block mb-12">
                   <div className="grid lg:grid-cols-2 gap-0 overflow-hidden">
                     <div className="relative aspect-[4/3] lg:aspect-auto overflow-hidden">
-                      {featured.coverImage ? (
-                        <Image src={featured.coverImage} alt={featured.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                      {featured.cover_image ? (
+                        <Image src={featured.cover_image} alt={featured.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                       ) : (
                         <div className="w-full h-full bg-cream-dark min-h-[300px]" />
                       )}
@@ -51,8 +51,8 @@ export default async function BlogPage() {
                     <div className="bg-cream p-10 flex flex-col justify-center">
                       <div className="flex items-center gap-3 mb-4">
                         <span className="text-[9px] tracking-widest uppercase bg-gold text-white px-3 py-1">{featured.category}</span>
-                        <span className="text-[10px] text-charcoal-light">{formatDate(featured.publishedAt)}</span>
-                        {featured.readTime && <span className="text-[10px] text-charcoal-light">· {featured.readTime}</span>}
+                        <span className="text-[10px] text-charcoal-light">{formatDate(featured.created_at)}</span>
+                        {featured.read_time && <span className="text-[10px] text-charcoal-light">· {featured.read_time}</span>}
                       </div>
                       <h2 className="font-serif text-3xl font-light text-charcoal mb-4 group-hover:text-gold transition-colors leading-tight">
                         {featured.title}
@@ -69,10 +69,10 @@ export default async function BlogPage() {
               {rest.length > 0 && (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {rest.map((post: any) => (
-                    <Link key={post._id} href={`/blog/${post.slug}`} className="group block">
+                    <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
                       <div className="relative overflow-hidden aspect-[4/3] mb-4 bg-cream-dark">
-                        {post.coverImage ? (
-                          <Image src={post.coverImage} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        {post.cover_image ? (
+                          <Image src={post.cover_image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                         ) : (
                           <div className="w-full h-full bg-cream-dark" />
                         )}
@@ -81,8 +81,8 @@ export default async function BlogPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[10px] text-charcoal-light">{formatDate(post.publishedAt)}</span>
-                        {post.readTime && <span className="text-[10px] text-charcoal-light">· {post.readTime}</span>}
+                        <span className="text-[10px] text-charcoal-light">{formatDate(post.created_at)}</span>
+                        {post.read_time && <span className="text-[10px] text-charcoal-light">· {post.read_time}</span>}
                       </div>
                       <h3 className="font-serif text-xl font-light text-charcoal mb-2 group-hover:text-gold transition-colors leading-snug">
                         {post.title}

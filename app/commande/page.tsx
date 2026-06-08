@@ -1,19 +1,16 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Shield, Truck, Check, CreditCard, ArrowRight } from 'lucide-react'
-
-const orderItems = [
-  { id: 1, name: 'Housse de Couette Satin Blanc 240x220', brand: 'Descamps', price: 1890, qty: 1 },
-  { id: 2, name: 'Couette Duvet Grand Froid 220x240', brand: 'Pyrenex', price: 3450, qty: 1 },
-]
+import { Shield, Truck, Check } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
 
 export default function CommandePage() {
+  const { items: orderItems } = useCart()
   const [form, setForm] = useState({
     prenom: '', nom: '', email: '', telephone: '',
     adresse: '', ville: '', notes: '',
   })
-  const [paymentMethod, setPaymentMethod] = useState<'online' | 'delivery'>('online')
+  const paymentMethod = 'delivery' as const
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [confirmed, setConfirmed] = useState(false)
@@ -54,6 +51,18 @@ export default function CommandePage() {
     setConfirmed(true)
   }
 
+  if (orderItems.length === 0 && !confirmed) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-6 py-20 bg-cream">
+        <div className="text-center">
+          <p className="font-serif text-2xl font-light text-charcoal mb-3">Votre panier est vide</p>
+          <p className="text-sm text-charcoal-light mb-6">Ajoutez des articles avant de passer commande.</p>
+          <Link href="/boutique" className="btn-primary">Voir la boutique</Link>
+        </div>
+      </div>
+    )
+  }
+
   if (confirmed) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-6 py-20 bg-cream">
@@ -73,7 +82,7 @@ export default function CommandePage() {
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-charcoal-light">Paiement</span>
-              <span className="font-medium text-charcoal">{paymentMethod === 'online' ? 'En ligne (CMI)' : 'À la livraison'}</span>
+              <span className="font-medium text-charcoal">Paiement à la livraison</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-charcoal-light">Total</span>
@@ -169,50 +178,17 @@ export default function CommandePage() {
                 <span className="w-6 h-6 bg-charcoal text-white text-xs flex items-center justify-center rounded-full">2</span>
                 Mode de paiement
               </h2>
-              <div className="space-y-3">
-
-                {/* Online */}
-                <label className={`flex items-start gap-4 p-4 border-2 cursor-pointer transition-all ${paymentMethod === 'online' ? 'border-charcoal bg-charcoal/5' : 'border-cream-dark hover:border-charcoal/30'}`}>
-                  <input type="radio" name="payment" className="hidden" checked={paymentMethod === 'online'} onChange={() => setPaymentMethod('online')} />
-                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${paymentMethod === 'online' ? 'border-charcoal' : 'border-charcoal-light'}`}>
-                    {paymentMethod === 'online' && <div className="w-2.5 h-2.5 bg-charcoal rounded-full" />}
+              <div className="flex items-start gap-4 p-4 border-2 border-charcoal bg-charcoal/5">
+                <div className="w-5 h-5 rounded-full border-2 border-charcoal flex-shrink-0 mt-0.5 flex items-center justify-center">
+                  <div className="w-2.5 h-2.5 bg-charcoal rounded-full" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Truck size={16} className="text-charcoal" />
+                    <span className="text-sm font-medium text-charcoal">Paiement à la livraison</span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <CreditCard size={16} className="text-charcoal" />
-                        <span className="text-sm font-medium text-charcoal">Paiement en ligne</span>
-                      </div>
-                      <div className="flex gap-1.5">
-                        {['VISA', 'MC', 'CMI'].map(c => (
-                          <span key={c} className="text-[9px] border border-cream-dark px-2 py-0.5 text-charcoal-light font-medium">{c}</span>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-charcoal-light mt-1">Paiement sécurisé par carte bancaire via CMI</p>
-                    {paymentMethod === 'online' && (
-                      <div className="flex items-center gap-1.5 mt-2">
-                        <Shield size={11} className="text-green-600" />
-                        <span className="text-[10px] text-green-600 font-medium">Cryptage SSL · 3D Secure</span>
-                      </div>
-                    )}
-                  </div>
-                </label>
-
-                {/* Delivery */}
-                <label className={`flex items-start gap-4 p-4 border-2 cursor-pointer transition-all ${paymentMethod === 'delivery' ? 'border-charcoal bg-charcoal/5' : 'border-cream-dark hover:border-charcoal/30'}`}>
-                  <input type="radio" name="payment" className="hidden" checked={paymentMethod === 'delivery'} onChange={() => setPaymentMethod('delivery')} />
-                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors ${paymentMethod === 'delivery' ? 'border-charcoal' : 'border-charcoal-light'}`}>
-                    {paymentMethod === 'delivery' && <div className="w-2.5 h-2.5 bg-charcoal rounded-full" />}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <Truck size={16} className="text-charcoal" />
-                      <span className="text-sm font-medium text-charcoal">Paiement à la livraison</span>
-                    </div>
-                    <p className="text-xs text-charcoal-light mt-1">Réglez en espèces à la réception · Sans frais supplémentaires</p>
-                  </div>
-                </label>
+                  <p className="text-xs text-charcoal-light mt-1">Réglez en espèces à la réception de votre commande · Sans frais supplémentaires</p>
+                </div>
               </div>
             </div>
 
@@ -224,9 +200,7 @@ export default function CommandePage() {
             >
               {loading
                 ? <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Traitement...</>
-                : paymentMethod === 'online'
-                  ? <><CreditCard size={16} /> Payer {total.toLocaleString('fr-MA')} MAD</>
-                  : <><Check size={16} /> Confirmer la commande</>
+                : <><Check size={16} /> Confirmer la commande — {total.toLocaleString('fr-MA')} MAD</>
               }
             </button>
 
@@ -243,8 +217,8 @@ export default function CommandePage() {
                 Votre commande
               </h3>
               <div className="space-y-3 mb-4">
-                {orderItems.map(item => (
-                  <div key={item.id} className="flex justify-between gap-3 text-xs">
+                {orderItems.map((item, i) => (
+                  <div key={item.id || i} className="flex justify-between gap-3 text-xs">
                     <div>
                       <p className="text-[10px] uppercase tracking-widest text-gold">{item.brand}</p>
                       <p className="text-charcoal leading-snug mt-0.5">{item.name}</p>
@@ -281,7 +255,7 @@ export default function CommandePage() {
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-charcoal-light">
                   <Shield size={12} className="text-gold flex-shrink-0" />
-                  Paiement 100% sécurisé CMI
+                  Paiement à la réception en espèces
                 </div>
                 <div className="flex items-center gap-2 text-[10px] text-charcoal-light">
                   <Check size={12} className="text-gold flex-shrink-0" />

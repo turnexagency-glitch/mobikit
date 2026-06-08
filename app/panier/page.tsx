@@ -3,7 +3,8 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Shield, Tag, X } from 'lucide-react'
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Shield, Tag, X, Truck } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
 
 // ============================================================
 //  CODES PROMO — modifier ici pour ajouter / supprimer
@@ -18,22 +19,18 @@ const PROMO_CODES: Record<string, { type: 'percent' | 'fixed'; value: number; la
 }
 // ============================================================
 
-const initialItems = [
-  { id: 1, name: 'Housse de Couette Satin Blanc 240x220', brand: 'Descamps', price: 1890, qty: 1, image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=300&q=80' },
-  { id: 2, name: 'Couette Duvet Grand Froid 220x240', brand: 'Pyrenex', price: 3450, qty: 1, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&q=80' },
-]
-
 export default function PanierPage() {
   const router = useRouter()
-  const [items, setItems] = useState(initialItems)
+  const { items, updateQty: cartUpdateQty, removeItem } = useCart()
   const [promoInput, setPromoInput] = useState('')
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null)
   const [promoError, setPromoError] = useState('')
 
-  const updateQty = (id: number, delta: number) => {
-    setItems(items.map(item => item.id === id ? { ...item, qty: Math.max(1, item.qty + delta) } : item))
+  const updateQty = (id: string, delta: number) => {
+    const item = items.find(i => i.id === id)
+    if (item) cartUpdateQty(id, Math.max(1, item.qty + delta))
   }
-  const remove = (id: number) => setItems(items.filter(item => item.id !== id))
+  const remove = (id: string) => removeItem(id)
 
   const applyPromo = () => {
     const code = promoInput.trim().toUpperCase()
@@ -89,7 +86,10 @@ export default function PanierPage() {
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-4 p-4 border border-cream-dark bg-white">
                     <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden bg-cream">
-                      <Image src={item.image} alt={item.name} fill className="object-cover" />
+                      {item.image
+                        ? <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        : <div className="w-full h-full bg-cream-dark" />
+                      }
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] tracking-widest uppercase text-gold mb-1">{item.brand}</p>
@@ -188,8 +188,8 @@ export default function PanierPage() {
                     Continuer mes Achats
                   </Link>
                   <div className="flex items-center gap-2 justify-center mt-4">
-                    <Shield size={12} className="text-gold" />
-                    <p className="text-[10px] text-charcoal-light tracking-wide">Paiement 100% sécurisé CMI</p>
+                    <Truck size={12} className="text-gold" />
+                    <p className="text-[10px] text-charcoal-light tracking-wide">Paiement à la livraison · En espèces</p>
                   </div>
                 </div>
               </div>

@@ -13,7 +13,7 @@ export const urlFor = (source: any) => builder.image(source)
 
 export async function getAllProducts() {
   return client.fetch(`
-    *[_type == "product"] | order(_createdAt desc) {
+    *[_type == "product" && published == true] | order(_createdAt desc) {
       _id, name, brand, category, price, oldPrice, badge, inStock, featured,
       description, sizes,
       "slug": slug.current,
@@ -25,7 +25,7 @@ export async function getAllProducts() {
 
 export async function getFeaturedProducts() {
   return client.fetch(`
-    *[_type == "product" && featured == true] | order(_createdAt desc)[0...4] {
+    *[_type == "product" && published == true && featured == true] | order(_createdAt desc)[0...4] {
       _id, name, brand, price, badge,
       "slug": slug.current,
       "image": images[0].asset->url,
@@ -39,7 +39,7 @@ export async function getProductsByCategory(category: string) {
   }
   const categories = aliases[category] || [category]
   return client.fetch(`
-    *[_type == "product" && category in $categories] | order(_createdAt desc) {
+    *[_type == "product" && published == true && category in $categories] | order(_createdAt desc) {
       _id, name, brand, price, badge, inStock,
       "slug": slug.current,
       "image": images[0].asset->url,
@@ -50,7 +50,7 @@ export async function getProductsByCategory(category: string) {
 export async function getProductsByBrand(brand: string | string[]) {
   const brands = Array.isArray(brand) ? brand : [brand]
   return client.fetch(`
-    *[_type == "product" && brand in $brands] | order(_createdAt desc) {
+    *[_type == "product" && published == true && brand in $brands] | order(_createdAt desc) {
       _id, name, brand, price, oldPrice, badge, inStock,
       "slug": slug.current,
       "image": images[0].asset->url,
@@ -77,6 +77,28 @@ export async function getPostBySlug(slug: string) {
       "coverImage": coverImage.asset->url,
       "publishedAt": publishedAt,
       content,
+    }
+  `, { slug })
+}
+
+export async function getAllBrands() {
+  return client.fetch(`
+    *[_type == "brand"] | order(featured desc, name asc) {
+      _id, name, tagline, country, description, featured, categories, sageNames,
+      "slug": slug.current,
+      "coverImage": coverImage.asset->url,
+      "logo": logo.asset->url,
+    }
+  `)
+}
+
+export async function getBrandBySlug(slug: string) {
+  return client.fetch(`
+    *[_type == "brand" && slug.current == $slug][0] {
+      _id, name, tagline, country, description, featured, sageNames,
+      "slug": slug.current,
+      "coverImage": coverImage.asset->url,
+      "logo": logo.asset->url,
     }
   `, { slug })
 }

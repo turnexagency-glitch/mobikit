@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { getAllProducts } from '@/lib/sanity'
+import { getAllProducts } from '@/lib/supabase'
 
 const categories = [
   { name: 'Linge de Lit', href: '/boutique/linge-de-lit', image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80' },
@@ -65,10 +65,10 @@ export default async function BoutiquePage() {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {products.map((product: any) => (
-                <Link key={product._id} href={`/produit/${product.slug}`} className="group cursor-pointer block">
+                <Link key={product.id} href={`/produit/${product.slug}`} className="group cursor-pointer block">
                   <div className="relative overflow-hidden aspect-[3/4] mb-3 bg-cream">
-                    {product.image ? (
-                      <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                    {product.images?.[0] ? (
+                      <Image src={product.images[0]} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-cream-dark">
                         <span className="text-xs text-charcoal-light">Photo à venir</span>
@@ -79,7 +79,7 @@ export default async function BoutiquePage() {
                         {product.badge}
                       </span>
                     )}
-                    {!product.inStock && (
+                    {!product.in_stock && (
                       <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                         <span className="text-xs tracking-widest uppercase text-charcoal font-medium">Rupture de stock</span>
                       </div>
@@ -89,8 +89,8 @@ export default async function BoutiquePage() {
                   <h3 className="text-xs font-light text-charcoal mb-1 leading-snug">{product.name}</h3>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-charcoal">{product.price?.toLocaleString('fr-MA')} MAD</p>
-                    {product.oldPrice && (
-                      <p className="text-xs text-charcoal-light line-through">{product.oldPrice?.toLocaleString('fr-MA')} MAD</p>
+                    {product.old_price && (
+                      <p className="text-xs text-charcoal-light line-through">{product.old_price?.toLocaleString('fr-MA')} MAD</p>
                     )}
                   </div>
                 </Link>

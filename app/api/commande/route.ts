@@ -1,14 +1,11 @@
 import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@sanity/client'
+import { createClient } from '@supabase/supabase-js'
 
-const sanityClient = createClient({
-  projectId: '72y7gp1y',
-  dataset: 'production',
-  apiVersion: '2024-01-01',
-  useCdn: false,
-  token: process.env.SANITY_WRITE_TOKEN,
-})
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlb3l5bXdla2p2dHpncGN0dnF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDg0MjM3MywiZXhwIjoyMDk2NDE4MzczfQ.cI3Ww0KU8a6z5JOpvOgTozrnE3PyscELUAc-FZLpzOM'
+)
 
 function emailClient(data: {
   prenom: string; nom: string; email: string; telephone: string
@@ -163,36 +160,33 @@ export async function POST(req: NextRequest) {
     const fromEmail = process.env.FROM_EMAIL || 'noreply@mobikit.ma'
     const adminEmail = process.env.ADMIN_EMAIL || 'commandes@mobikit.ma'
 
-    // Save order to Sanity
-    if (process.env.SANITY_WRITE_TOKEN) {
-      try {
-        await sanityClient.create({
-          _type: 'order',
-          orderId,
-          status: 'pending',
-          paymentMethod,
-          total,
-          createdAt: new Date().toISOString(),
-          customer: {
-            prenom: form.prenom,
-            nom: form.nom,
-            email: form.email,
-            telephone: form.telephone,
-            ville: form.ville,
-            adresse: form.adresse,
-            notes: form.notes || '',
-          },
-          items: items.map((i: any) => ({
-            _key: Math.random().toString(36).slice(2),
-            name: i.name,
-            brand: i.brand,
-            price: i.price,
-            qty: i.qty,
-          })),
-        })
-      } catch (e) {
-        console.error('Sanity save error:', e)
-      }
+    // Save order to Supabase
+    try {
+      await supabase.from('orders').insert({
+        order_id: orderId,
+        status: 'pending',
+        payment_method: paymentMethod,
+        total,
+        subtotal,
+        shipping,
+        customer: {
+          prenom: form.prenom,
+          nom: form.nom,
+          email: form.email,
+          telephone: form.telephone,
+          ville: form.ville,
+          adresse: form.adresse,
+          notes: form.notes || '',
+        },
+        items: items.map((i: any) => ({
+          name: i.name,
+          brand: i.brand,
+          price: i.price,
+          qty: i.qty,
+        })),
+      })
+    } catch (e) {
+      console.error('Supabase save error:', e)
     }
 
     if (!process.env.RESEND_API_KEY) {

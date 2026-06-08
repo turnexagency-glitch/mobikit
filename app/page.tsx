@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Star, Truck, Shield, RefreshCw, Headphones } from 'lucide-react'
 import SmartImage from '@/components/SmartImage'
-import { getFeaturedProducts } from '@/lib/sanity'
+import { getFeaturedProducts, getAllPosts } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,42 +11,42 @@ const categories = [
     name: 'Linge de Lit',
     description: 'Parures, draps & housses',
     href: '/boutique/linge-de-lit',
-    image: '/images/descamps-lit-vert.jpg',
+    image: '/categories/linge-de-lit.webp',
     fallback: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=600&q=80',
   },
   {
     name: 'Linge de Bain',
     description: 'Serviettes & peignoirs',
     href: '/boutique/linge-de-bain',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    image: '/categories/linge-de-bain.webp',
     fallback: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
   },
   {
     name: 'Linge de Table',
     description: 'Nappes, serviettes & sets',
     href: '/boutique/linge-de-table',
-    image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+    image: '/categories/linge-de-table.webp',
     fallback: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
   },
   {
     name: 'Décoration',
     description: 'Plaids, coussins & objets',
     href: '/boutique/decoration',
-    image: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80',
+    image: '/categories/Decoration.webp',
     fallback: 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80',
   },
   {
     name: 'Literie de Luxe',
     description: 'Matelas, couettes & oreillers',
     href: '/boutique/literie',
-    image: '/images/treca-matelas-blanc.jpg',
+    image: '/categories/accessoires-salle-de-Bain.webp',
     fallback: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
   },
   {
     name: 'Senteurs & Bougies',
     description: 'Parfums d\'intérieur',
     href: '/boutique/senteurs-bougies',
-    image: '/images/esteban-diffuseurs.jpg',
+    image: '/categories/senteurs-bougies.webp',
     fallback: 'https://images.unsplash.com/photo-1602523961358-f9f03dd557db?w=600&q=80',
   },
 ]
@@ -62,40 +62,6 @@ const brands = [
   { name: 'Blomus', tagline: 'Design Contemporain', href: '/marques/blomus' },
 ]
 
-const featuredProducts = [
-  {
-    name: 'Parure de Lit Satin Fleuri',
-    brand: 'Descamps',
-    price: '1 890',
-    image: '/images/descamps-lit-beige.jpg',
-    fallback: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=500&q=80',
-    badge: 'Nouveau',
-  },
-  {
-    name: 'Couette Premium Grand Froid',
-    brand: 'Pyrenex',
-    price: '3 450',
-    image: '/images/pyrenex-couette.jpg',
-    fallback: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&q=80',
-    badge: 'Bestseller',
-  },
-  {
-    name: 'Diffuseur Ambré Collection',
-    brand: 'Esteban Paris',
-    price: '580',
-    image: '/images/esteban-diffuseurs.jpg',
-    fallback: 'https://images.unsplash.com/photo-1602523961358-f9f03dd557db?w=500&q=80',
-    badge: 'Exclusif',
-  },
-  {
-    name: 'Matelas Impérial 160x200',
-    brand: 'Treca Paris',
-    price: '18 500',
-    image: '/images/treca-paris.jpg',
-    fallback: 'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=500&q=80',
-    badge: 'Premium',
-  },
-]
 
 const services = [
   { icon: Truck, title: 'Livraison au Maroc', desc: 'Livraison soignée dans tout le royaume' },
@@ -105,11 +71,15 @@ const services = [
 ]
 
 export default async function HomePage() {
-  const sanityFeatured = await getFeaturedProducts().catch(() => [])
+  const [featuredProducts, posts] = await Promise.all([
+    getFeaturedProducts().catch(() => []),
+    getAllPosts().catch(() => []),
+  ])
+  const inspirations = posts.slice(0, 3)
   return (
     <>
       {/* Hero */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative flex items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 184px)', minHeight: 560 }}>
         <div className="absolute inset-0">
           <SmartImage
             src="/images/descamps-lit-tropical.jpg"
@@ -255,13 +225,13 @@ export default async function HomePage() {
               Voir tout <ArrowRight size={14} />
             </Link>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {sanityFeatured.length > 0
-              ? sanityFeatured.map((product: any) => (
-                <Link key={product._id} href={`/produit/${product.slug}`} className="group cursor-pointer block">
+          {featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product: any) => (
+                <Link key={product.id} href={`/produit/${product.slug}`} className="group cursor-pointer block">
                   <div className="relative overflow-hidden aspect-[3/4] mb-4 bg-cream">
-                    {product.image
-                      ? <Image src={product.image} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                    {product.images?.[0]
+                      ? <Image src={product.images[0]} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                       : <div className="w-full h-full bg-cream-dark" />
                     }
                     {product.badge && (
@@ -274,30 +244,13 @@ export default async function HomePage() {
                   <h3 className="text-sm font-light text-charcoal mb-1 line-clamp-2 leading-snug">{product.name}</h3>
                   <p className="text-sm font-medium text-charcoal">{product.price?.toLocaleString('fr-MA')} MAD</p>
                 </Link>
-              ))
-              : featuredProducts.map((product) => (
-                <div key={product.name} className="group cursor-pointer">
-                  <div className="relative overflow-hidden aspect-[3/4] mb-4">
-                    <SmartImage
-                      src={product.image}
-                      fallback={product.fallback}
-                      alt={product.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    {product.badge && (
-                      <div className="absolute top-3 left-3 bg-gold text-white text-[9px] tracking-widest uppercase px-2 py-1">
-                        {product.badge}
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-[10px] tracking-widest uppercase text-gold mb-1">{product.brand}</p>
-                  <h3 className="text-sm font-light text-charcoal mb-1 line-clamp-2 leading-snug">{product.name}</h3>
-                  <p className="text-sm font-medium text-charcoal">{product.price} MAD</p>
-                </div>
-              ))
-            }
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-charcoal-light text-sm">
+              Les coups de cœur seront disponibles prochainement.
+            </div>
+          )}
         </div>
       </section>
 
@@ -357,6 +310,72 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Inspirations */}
+      {inspirations.length > 0 && (
+        <section className="py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-end justify-between mb-14">
+              <div>
+                <p className="section-subtitle mb-3">Le Magazine</p>
+                <h2 className="section-title">Inspirations & Conseils</h2>
+              </div>
+              <Link href="/blog" className="hidden md:flex items-center gap-2 text-xs tracking-widest uppercase text-charcoal hover:text-gold transition-colors font-medium">
+                Tous les articles <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {inspirations.map((post: any, i: number) => (
+                <Link key={post.id} href={`/blog/${post.slug}`} className="group block">
+                  <div className="relative overflow-hidden aspect-[4/3] mb-5 bg-cream-dark">
+                    {post.cover_image ? (
+                      <Image
+                        src={post.cover_image}
+                        alt={post.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-cream-dark" />
+                    )}
+                    <span className="absolute top-3 left-3 bg-gold text-white text-[9px] tracking-widest uppercase px-3 py-1">
+                      {post.category}
+                    </span>
+                    {i === 0 && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-[10px] text-charcoal-light">
+                      {new Date(post.created_at).toLocaleDateString('fr-MA', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </span>
+                    {post.read_time && (
+                      <>
+                        <span className="w-1 h-1 bg-charcoal-light rounded-full" />
+                        <span className="text-[10px] text-charcoal-light">{post.read_time}</span>
+                      </>
+                    )}
+                  </div>
+                  <h3 className="font-serif text-xl font-light text-charcoal mb-2 group-hover:text-gold transition-colors leading-snug">
+                    {post.title}
+                  </h3>
+                  <p className="text-xs text-charcoal-light leading-relaxed line-clamp-2 mb-4">
+                    {post.excerpt}
+                  </p>
+                  <span className="text-[10px] tracking-widest uppercase text-gold font-medium flex items-center gap-1.5 group-hover:gap-3 transition-all duration-300">
+                    Lire l&apos;article <ArrowRight size={11} />
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="text-center mt-10 md:hidden">
+              <Link href="/blog" className="btn-outline">
+                Tous les articles
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Banner */}
       <section className="relative py-24 overflow-hidden">

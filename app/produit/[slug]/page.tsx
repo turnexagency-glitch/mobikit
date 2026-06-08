@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Shield, Truck, RefreshCw, Star } from 'lucide-react'
-import { getProductBySlug } from '@/lib/sanity'
+import { getProductBySlug } from '@/lib/supabase'
 import AddToCartButton from '@/components/AddToCartButton'
 import ProductGallery from '@/components/ProductGallery'
 
@@ -12,8 +12,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   if (!product) notFound()
 
-  const discount = product.oldPrice
-    ? Math.round((1 - product.price / product.oldPrice) * 100)
+  const discount = product.old_price
+    ? Math.round((1 - product.price / product.old_price) * 100)
     : null
 
   const images: string[] = product.images || []
@@ -70,9 +70,9 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 <span className="font-serif text-3xl font-light text-charcoal">
                   {product.price?.toLocaleString('fr-MA')} MAD
                 </span>
-                {product.oldPrice && (
+                {product.old_price && (
                   <span className="text-base text-charcoal-light line-through">
-                    {product.oldPrice?.toLocaleString('fr-MA')} MAD
+                    {product.old_price?.toLocaleString('fr-MA')} MAD
                   </span>
                 )}
               </div>

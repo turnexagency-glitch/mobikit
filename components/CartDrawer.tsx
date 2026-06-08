@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import { X, Minus, Plus, ShoppingBag, Shield } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, Truck } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useRouter } from 'next/navigation'
 
@@ -136,22 +136,16 @@ export default function CartDrawer() {
             </div>
             <button
               onClick={() => { closeCart(); router.push('/commande') }}
-              className="w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white py-4 text-sm font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 rounded"
+              className="w-full bg-charcoal hover:bg-charcoal-dark text-white py-4 text-sm font-semibold tracking-wide transition-colors flex items-center justify-center gap-2 rounded"
             >
               COMMANDER · {finalTotal.toLocaleString('fr-MA')} MAD
             </button>
-            <button onClick={closeCart} className="w-full text-center text-xs underline text-charcoal-light mt-2 hover:text-gold transition-colors">
+            <button onClick={() => { closeCart(); router.push('/panier') }} className="w-full text-center text-xs underline text-charcoal-light mt-2 hover:text-gold transition-colors">
               VOIR LE PANIER
             </button>
             <div className="flex items-center justify-center gap-1 mt-3">
-              <Shield size={14} className="text-charcoal" />
-              <span className="text-[10px] text-charcoal-light font-medium">Ce site est sécurisé 3D Secure</span>
-            </div>
-            <div className="flex items-center justify-center gap-2 mt-2">
-              {['CMI', 'VISA', 'MC'].map(c => (
-                <span key={c} className="text-[9px] border border-gray-200 px-2 py-0.5 text-charcoal-light font-bold tracking-wider">{c}</span>
-              ))}
-              <span className="text-[9px] text-charcoal-light">Verified by VISA</span>
+              <Truck size={14} className="text-charcoal" />
+              <span className="text-[10px] text-charcoal-light font-medium">Paiement à la livraison · En espèces</span>
             </div>
           </div>
         )}

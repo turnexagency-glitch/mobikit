@@ -1,5 +1,5 @@
 'use client'
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 export interface CartItem {
   id: string
@@ -26,8 +26,18 @@ interface CartContextType {
 const CartContext = createContext<CartContextType>({} as CartContextType)
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([])
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      const saved = localStorage.getItem('mobikit-cart')
+      return saved ? JSON.parse(saved) : []
+    } catch { return [] }
+  })
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    localStorage.setItem('mobikit-cart', JSON.stringify(items))
+  }, [items])
 
   const addItem = (item: Omit<CartItem, 'qty'>) => {
     setItems(prev => {

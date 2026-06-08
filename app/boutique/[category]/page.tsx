@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getProductsByCategory } from '@/lib/sanity'
+import { getProductsByCategory } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -47,11 +47,11 @@ export default async function CategoryPage({ params }: { params: { category: str
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {products.map((product: any) => (
-                <Link key={product._id} href={`/produit/${product.slug}`} className="group block">
+                <Link key={product.id} href={`/produit/${product.slug}`} className="group block">
                   <div className="relative overflow-hidden aspect-[3/4] mb-3 bg-cream">
-                    {product.image ? (
+                    {product.images?.[0] ? (
                       <Image
-                        src={product.image}
+                        src={product.images?.[0]}
                         alt={product.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -66,7 +66,7 @@ export default async function CategoryPage({ params }: { params: { category: str
                         {product.badge}
                       </span>
                     )}
-                    {!product.inStock && (
+                    {!product.in_stock && (
                       <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                         <span className="text-xs tracking-widest uppercase text-charcoal font-medium">Rupture de stock</span>
                       </div>
@@ -76,8 +76,8 @@ export default async function CategoryPage({ params }: { params: { category: str
                   <h3 className="text-xs font-light text-charcoal mb-1 leading-snug">{product.name}</h3>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-charcoal">{product.price?.toLocaleString('fr-MA')} MAD</p>
-                    {product.oldPrice && (
-                      <p className="text-xs text-charcoal-light line-through">{product.oldPrice?.toLocaleString('fr-MA')} MAD</p>
+                    {product.old_price && (
+                      <p className="text-xs text-charcoal-light line-through">{product.old_price?.toLocaleString('fr-MA')} MAD</p>
                     )}
                   </div>
                 </Link>

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getPostBySlug } from '@/lib/sanity'
+import { getPostBySlug } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,23 +10,31 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('fr-MA', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-function renderContent(blocks: any[]) {
-  if (!blocks) return null
-  return blocks.map((block: any, i: number) => {
-    if (block._type === 'image') {
-      return (
+function renderContent(content: any) {
+  if (!content) return null
+  // Supabase stocke le contenu en texte brut
+  if (typeof content === 'string') {
+    return content.split('\n\n').map((para: string, i: number) => (
+      para.trim() ? <p key={i} className="text-sm text-charcoal-light leading-relaxed mb-4">{para}</p> : null
+    ))
+  }
+  // Ancien format Sanity (blocks)
+  if (Array.isArray(content)) {
+    return content.map((block: any, i: number) => {
+      if (block._type === 'image') return (
         <div key={i} className="my-8 relative aspect-[16/9] overflow-hidden">
           <Image src={block.asset?.url || ''} alt="" fill className="object-cover" />
         </div>
       )
-    }
-    if (block._type !== 'block') return null
-    const text = block.children?.map((c: any) => c.text).join('') || ''
-    if (block.style === 'h2') return <h2 key={i} className="font-serif text-2xl font-light text-charcoal mt-8 mb-4">{text}</h2>
-    if (block.style === 'h3') return <h3 key={i} className="font-serif text-xl font-light text-charcoal mt-6 mb-3">{text}</h3>
-    if (block.style === 'blockquote') return <blockquote key={i} className="border-l-2 border-gold pl-6 my-6 italic text-charcoal-light">{text}</blockquote>
-    return <p key={i} className="text-sm text-charcoal-light leading-relaxed mb-4">{text}</p>
-  })
+      if (block._type !== 'block') return null
+      const text = block.children?.map((c: any) => c.text).join('') || ''
+      if (block.style === 'h2') return <h2 key={i} className="font-serif text-2xl font-light text-charcoal mt-8 mb-4">{text}</h2>
+      if (block.style === 'h3') return <h3 key={i} className="font-serif text-xl font-light text-charcoal mt-6 mb-3">{text}</h3>
+      if (block.style === 'blockquote') return <blockquote key={i} className="border-l-2 border-gold pl-6 my-6 italic text-charcoal-light">{text}</blockquote>
+      return <p key={i} className="text-sm text-charcoal-light leading-relaxed mb-4">{text}</p>
+    })
+  }
+  return null
 }
 
 export default async function PostPage({ params }: { params: { slug: string } }) {
@@ -37,8 +45,8 @@ export default async function PostPage({ params }: { params: { slug: string } })
     <>
       {/* Hero */}
       <section className="relative h-80 md:h-[500px] overflow-hidden">
-        {post.coverImage ? (
-          <Image src={post.coverImage} alt={post.title} fill className="object-cover" priority />
+        {post.cover_image ? (
+          <Image src={post.cover_image} alt={post.title} fill className="object-cover" priority />
         ) : (
           <div className="w-full h-full bg-cream-dark" />
         )}
@@ -47,8 +55,8 @@ export default async function PostPage({ params }: { params: { slug: string } })
           <span className="text-[9px] tracking-widest uppercase bg-gold px-3 py-1 mb-4">{post.category}</span>
           <h1 className="font-serif text-3xl md:text-5xl font-light max-w-3xl leading-tight mb-4">{post.title}</h1>
           <div className="flex items-center gap-3 text-[11px] text-white/70">
-            <span>{formatDate(post.publishedAt)}</span>
-            {post.readTime && <><span>·</span><span>{post.readTime} de lecture</span></>}
+            <span>{formatDate(post.created_at)}</span>
+            {post.read_time && <><span>·</span><span>{post.read_time} de lecture</span></>}
           </div>
         </div>
       </section>

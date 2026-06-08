@@ -7,7 +7,7 @@ export default function AddToCartButton({ product }: { product: any }) {
 
   const handleCommander = () => {
     addItem({
-      id: product._id || product.slug,
+      id: product.id || product.slug,
       name: product.name,
       brand: product.brand || '',
       price: product.price,
