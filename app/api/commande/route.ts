@@ -1,6 +1,8 @@
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -115,7 +117,7 @@ function emailClient(data: {
                 Mobikit Home Collections · Casablanca, Maroc
               </p>
               <p style="font-size:10px;color:#6b7280;margin:0;">
-                <a href="mailto:contact@mobikit.ma" style="color:#C4A35A;text-decoration:none;">contact@mobikit.ma</a>
+                <a href="mailto:mobikit@mobikit.ma" style="color:#C4A35A;text-decoration:none;">mobikit@mobikit.ma</a>
               </p>
             </td>
           </tr>
@@ -158,7 +160,7 @@ export async function POST(req: NextRequest) {
     const { form, items, paymentMethod, subtotal, shipping, total, orderId } = body
 
     const fromEmail = process.env.FROM_EMAIL || 'noreply@mobikit.ma'
-    const adminEmail = process.env.ADMIN_EMAIL || 'commandes@mobikit.ma'
+    const adminEmail = process.env.ADMIN_EMAIL || 'mobikit@mobikit.ma'
 
     // Save order to Supabase
     try {
@@ -189,33 +191,20 @@ export async function POST(req: NextRequest) {
       console.error('Supabase save error:', e)
     }
 
-    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.warn('SMTP non configuré — email non envoyé')
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('RESEND_API_KEY non configuré — email non envoyé')
       return NextResponse.json({ success: true, orderId, emailSent: false })
     }
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '465'),
-      secure: (process.env.SMTP_PORT || '465') === '465',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      tls: { rejectUnauthorized: false },
-    })
-
     try {
       await Promise.all([
-        // Email de confirmation au client
-        transporter.sendMail({
+        resend.emails.send({
           from: `Mobikit Home Collections <${fromEmail}>`,
           to: form.email,
           subject: `Confirmation de commande ${orderId} — Mobikit`,
           html: emailClient({ ...form, paymentMethod, items, subtotal, shipping, total, orderId }),
         }),
-        // Notification interne à contact@mobikit.ma
-        transporter.sendMail({
+        resend.emails.send({
           from: `Mobikit Boutique <${fromEmail}>`,
           to: adminEmail,
           subject: `🛍️ Nouvelle commande ${orderId} — ${form.prenom} ${form.nom} — ${total.toLocaleString('fr-MA')} MAD`,
@@ -224,7 +213,7 @@ export async function POST(req: NextRequest) {
       ])
       return NextResponse.json({ success: true, orderId, emailSent: true })
     } catch (emailErr) {
-      console.error('SMTP error (order saved):', emailErr)
+      console.error('Resend error (order saved):', emailErr)
       return NextResponse.json({ success: true, orderId, emailSent: false })
     }
   } catch (err) {

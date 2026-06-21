@@ -50,8 +50,6 @@ export default function PanierPage() {
   }
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0)
-  const freeShipping = subtotal >= 500
-  const shipping = freeShipping ? 0 : 60
 
   const discount = appliedPromo
     ? PROMO_CODES[appliedPromo].type === 'percent'
@@ -59,7 +57,7 @@ export default function PanierPage() {
       : PROMO_CODES[appliedPromo].value
     : 0
 
-  const total = subtotal + shipping - discount
+  const total = subtotal - discount
 
   return (
     <>
@@ -164,15 +162,11 @@ export default function PanierPage() {
                     )}
                     <div className="flex justify-between text-xs text-charcoal-light">
                       <span>Livraison</span>
-                      <span className={freeShipping ? 'text-green-600 font-medium' : ''}>
-                        {freeShipping ? 'Gratuite' : `${shipping} MAD`}
-                      </span>
+                      <span className="text-gold">Calculée à la commande</span>
                     </div>
-                    {!freeShipping && (
-                      <p className="text-[10px] text-gold">
-                        Plus que {(500 - subtotal).toLocaleString('fr-MA')} DH pour la livraison gratuite à Casablanca
-                      </p>
-                    )}
+                    <p className="text-[10px] text-charcoal-light">
+                      À partir de 20 DH (Casablanca) · 35 DH (autres villes) + supplément poids
+                    </p>
                   </div>
                   <div className="flex justify-between mb-6">
                     <span className="text-sm font-medium text-charcoal">Total</span>

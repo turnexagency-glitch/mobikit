@@ -124,6 +124,14 @@ export default {
       ],
     },
     {
+      name: 'weight',
+      title: 'Poids (Kg)',
+      type: 'number',
+      group: 'details',
+      description: 'Poids du produit en kilogrammes — utilisé pour calculer les frais de livraison',
+      validation: (R: any) => R.positive(),
+    },
+    {
       name: 'specs',
       title: 'Caractéristiques techniques',
       type: 'array',

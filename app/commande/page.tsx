@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Shield, Truck, Check } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
+import { calculateShipping, shippingZoneLabel } from '@/lib/shipping'
 
 export default function CommandePage() {
   const { items: orderItems } = useCart()
@@ -17,7 +18,8 @@ export default function CommandePage() {
   const [orderId] = useState(`#MBK-${Date.now().toString().slice(-6)}`)
 
   const subtotal = orderItems.reduce((s, i) => s + i.price * i.qty, 0)
-  const shipping = subtotal >= 500 ? 0 : 60
+  const totalWeightKg = orderItems.reduce((s, i) => s + (i.weight || 0) * i.qty, 0)
+  const shipping = calculateShipping(totalWeightKg, form.ville)
   const total = subtotal + shipping
 
   const update = (k: string, v: string) => {
@@ -235,12 +237,18 @@ export default function CommandePage() {
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-charcoal-light">Livraison</span>
-                  <span className={shipping === 0 ? 'text-green-600 font-medium text-xs' : 'text-xs text-charcoal-light'}>
-                    {shipping === 0 ? 'Gratuite' : `${shipping} MAD`}
+                  <span className="text-xs text-charcoal-light">
+                    {form.ville ? `${shipping} MAD` : '—'}
                   </span>
                 </div>
-                {shipping > 0 && (
-                  <p className="text-[10px] text-gold">Livraison gratuite dès 500 MAD</p>
+                {form.ville && (
+                  <p className="text-[10px] text-charcoal-light">
+                    {shippingZoneLabel(form.ville)}
+                    {totalWeightKg > 0 && ` · ${totalWeightKg.toFixed(1)} Kg`}
+                  </p>
+                )}
+                {!form.ville && (
+                  <p className="text-[10px] text-gold">Sélectionnez votre ville pour calculer la livraison</p>
                 )}
                 <div className="flex justify-between pt-2 border-t border-cream-dark">
                   <span className="text-sm font-medium text-charcoal">Total</span>

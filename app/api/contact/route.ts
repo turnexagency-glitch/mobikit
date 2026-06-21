@@ -1,32 +1,22 @@
-import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { nom, email, telephone, sujet, message } = body
 
-    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    if (!process.env.RESEND_API_KEY) {
       return NextResponse.json({ success: false, error: 'Email non configuré' }, { status: 500 })
     }
 
-    const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_USER
-    const adminEmail = process.env.ADMIN_EMAIL || 'contact@mobikit.ma'
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || '465'),
-      secure: (process.env.SMTP_PORT || '465') === '465',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      tls: { rejectUnauthorized: false },
-    })
+    const fromEmail = process.env.FROM_EMAIL || 'noreply@mobikit.ma'
+    const adminEmail = process.env.ADMIN_EMAIL || 'mobikit@mobikit.ma'
 
     await Promise.all([
-      // Notification à contact@mobikit.ma
-      transporter.sendMail({
+      resend.emails.send({
         from: `Mobikit Site Web <${fromEmail}>`,
         to: adminEmail,
         replyTo: email,
@@ -53,8 +43,7 @@ export async function POST(req: NextRequest) {
         `,
       }),
 
-      // Email de confirmation au visiteur
-      transporter.sendMail({
+      resend.emails.send({
         from: `Mobikit Home Collections <${fromEmail}>`,
         to: email,
         subject: 'Votre message a bien été reçu — Mobikit',
@@ -84,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('SMTP contact error:', err)
+    console.error('Resend contact error:', err)
     return NextResponse.json({ success: false }, { status: 500 })
   }
 }

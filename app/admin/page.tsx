@@ -530,7 +530,7 @@ export default function AdminPage() {
                   <div className="relative">
                     <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
                     <input value={settings.contact?.email || ''} onChange={e => us('contact', 'email', e.target.value)}
-                      placeholder="contact@mobikit.ma" className="input-admin pl-8" />
+                      placeholder="mobikit@mobikit.ma" className="input-admin pl-8" />
                   </div>
                 </Field>
                 <Field label="Adresse">

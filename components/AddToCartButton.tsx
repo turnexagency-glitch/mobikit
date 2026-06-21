@@ -13,6 +13,7 @@ export default function AddToCartButton({ product }: { product: any }) {
       price: product.price,
       image: product.images?.[0] || product.image || '',
       slug: product.slug,
+      weight: product.weight || 0,
     })
   }
 

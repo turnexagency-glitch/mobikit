@@ -9,6 +9,7 @@ export interface CartItem {
   image: string
   slug: string
   qty: number
+  weight: number
 }
 
 interface CartContextType {

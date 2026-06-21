@@ -15,8 +15,7 @@ const suggestions = [
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQty, total, addItem } = useCart()
   const router = useRouter()
-  const shipping = total >= 500 ? 0 : 60
-  const finalTotal = total + shipping
+  const finalTotal = total
 
   if (!isOpen) return null
 
@@ -51,16 +50,11 @@ export default function CartDrawer() {
             </div>
           ) : (
             <>
-              {/* Free shipping banner */}
-              {shipping === 0 ? (
-                <div className="bg-green-50 border-b border-green-100 px-5 py-2.5 flex items-center gap-2">
-                  <span className="text-green-600 text-xs font-medium">🎉 Frais de livraison offerts !</span>
-                </div>
-              ) : (
-                <div className="bg-amber-50 border-b border-amber-100 px-5 py-2.5">
-                  <p className="text-[11px] text-amber-700">Plus que <strong>{(500 - total).toLocaleString('fr-MA')} MAD</strong> pour la livraison gratuite</p>
-                </div>
-              )}
+              {/* Shipping info banner */}
+              <div className="bg-cream border-b border-cream-dark px-5 py-2.5 flex items-center gap-2">
+                <Truck size={12} className="text-gold flex-shrink-0" />
+                <p className="text-[11px] text-charcoal-light">Livraison à partir de <strong>20 DH</strong> Casablanca · <strong>35 DH</strong> autres villes</p>
+              </div>
 
               {/* Cart items */}
               <div className="px-5 py-4 space-y-4 border-b border-gray-100">
@@ -106,7 +100,7 @@ export default function CartDrawer() {
                         <p className="text-xs text-charcoal-light">{s.price.toLocaleString('fr-MA')} MAD</p>
                       </div>
                       <button
-                        onClick={() => addItem({ id: s.slug, name: s.name, brand: '', price: s.price, image: s.image, slug: s.slug })}
+                        onClick={() => addItem({ id: s.slug, name: s.name, brand: '', price: s.price, image: s.image, slug: s.slug, weight: 0 })}
                         className="w-7 h-7 border border-charcoal flex items-center justify-center text-charcoal hover:bg-charcoal hover:text-white transition-colors flex-shrink-0"
                       >
                         <Plus size={12} />

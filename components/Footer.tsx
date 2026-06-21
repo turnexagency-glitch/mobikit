@@ -129,8 +129,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={14} className="text-gold flex-shrink-0" />
-                <a href="mailto:contact@mobikit.ma" className="text-xs text-gray-300 hover:text-gold transition-colors">
-                  contact@mobikit.ma
+                <a href="mailto:mobikit@mobikit.ma" className="text-xs text-gray-300 hover:text-gold transition-colors">
+                  mobikit@mobikit.ma
                 </a>
               </li>
             </ul>

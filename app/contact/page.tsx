@@ -78,8 +78,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-xs font-medium tracking-widest uppercase text-charcoal mb-1">Email</p>
-                      <a href="mailto:contact@mobikit.ma" className="text-xs text-charcoal-light hover:text-gold transition-colors">
-                        contact@mobikit.ma
+                      <a href="mailto:mobikit@mobikit.ma" className="text-xs text-charcoal-light hover:text-gold transition-colors">
+                        mobikit@mobikit.ma
                       </a>
                     </div>
                   </div>
