@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { transporter } from '@/lib/mailer'
+import { sendMail } from '@/lib/mailer'
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,12 +7,10 @@ export async function POST(req: NextRequest) {
     const { nom, email, telephone, sujet, message } = body
 
     const adminEmail = process.env.ADMIN_EMAIL || 'contact@mobikit.ma'
-    const fromEmail  = process.env.SMTP_USER    || 'contact@mobikit.ma'
 
     await Promise.all([
       // Notification admin
-      transporter.sendMail({
-        from: `"Mobikit Site Web" <${fromEmail}>`,
+      sendMail({
         to: adminEmail,
         replyTo: email,
         subject: `📩 Nouveau message — ${sujet} | ${nom}`,
@@ -39,9 +37,9 @@ export async function POST(req: NextRequest) {
       }),
 
       // Confirmation client
-      transporter.sendMail({
-        from: `"Mobikit Home Collections" <${fromEmail}>`,
+      sendMail({
         to: email,
+        fromName: 'Mobikit Home Collections',
         subject: 'Votre message a bien été reçu — Mobikit',
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;background:#f9f7f4;">

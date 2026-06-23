@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { transporter } from '@/lib/mailer'
+import { sendMail } from '@/lib/mailer'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -157,8 +157,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { form, items, paymentMethod, subtotal, shipping, total, orderId } = body
 
-    const fromEmail  = process.env.SMTP_USER    || 'contact@mobikit.ma'
-    const adminEmail = process.env.ADMIN_EMAIL  || 'contact@mobikit.ma'
+    const adminEmail = process.env.ADMIN_EMAIL || 'contact@mobikit.ma'
 
     // Save order to Supabase
     try {
@@ -191,15 +190,15 @@ export async function POST(req: NextRequest) {
 
     try {
       await Promise.all([
-        transporter.sendMail({
-          from: `"Mobikit Home Collections" <${fromEmail}>`,
+        sendMail({
           to: form.email,
+          fromName: 'Mobikit Home Collections',
           subject: `Confirmation de commande ${orderId} — Mobikit`,
           html: emailClient({ ...form, paymentMethod, items, subtotal, shipping, total, orderId }),
         }),
-        transporter.sendMail({
-          from: `"Mobikit Boutique" <${fromEmail}>`,
+        sendMail({
           to: adminEmail,
+          fromName: 'Mobikit Boutique',
           subject: `🛍️ Nouvelle commande ${orderId} — ${form.prenom} ${form.nom} — ${total.toLocaleString('fr-MA')} MAD`,
           html: emailAdmin({ ...form, paymentMethod, items, total, orderId }),
         }),
