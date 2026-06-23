@@ -6,34 +6,58 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
   const staticPages = [
-    { url: base, priority: 1.0, changeFrequency: 'daily' as const },
-    { url: `${base}/boutique`, priority: 0.9, changeFrequency: 'daily' as const },
-    { url: `${base}/marques`, priority: 0.8, changeFrequency: 'weekly' as const },
-    { url: `${base}/showroom`, priority: 0.7, changeFrequency: 'monthly' as const },
-    { url: `${base}/blog`, priority: 0.8, changeFrequency: 'weekly' as const },
-    { url: `${base}/a-propos`, priority: 0.6, changeFrequency: 'monthly' as const },
-    { url: `${base}/contact`, priority: 0.7, changeFrequency: 'monthly' as const },
-    { url: `${base}/faq`, priority: 0.5, changeFrequency: 'monthly' as const },
+    { url: base,                    priority: 1.0, changeFrequency: 'daily'   as const },
+    { url: `${base}/boutique`,      priority: 0.95, changeFrequency: 'daily'  as const },
+    { url: `${base}/marques`,       priority: 0.85, changeFrequency: 'weekly' as const },
+    { url: `${base}/showroom`,      priority: 0.80, changeFrequency: 'monthly' as const },
+    { url: `${base}/blog`,          priority: 0.80, changeFrequency: 'weekly' as const },
+    { url: `${base}/contact`,       priority: 0.75, changeFrequency: 'monthly' as const },
+    { url: `${base}/faq`,           priority: 0.70, changeFrequency: 'monthly' as const },
+    { url: `${base}/a-propos`,      priority: 0.60, changeFrequency: 'monthly' as const },
   ]
 
-  const categories = [
-    'linge-de-lit', 'linge-de-table', 'linge-de-bain',
-    'esteban-parfums', 'literie', 'mobilier', 'decoration',
-    'accessoires-sdb', 'pyjama-homewear',
-  ].map(cat => ({
+  // Catégories par priorité SEO (volume de recherche estimé)
+  const categoryPriorities: Record<string, number> = {
+    'linge-de-lit': 0.92,
+    'literie': 0.90,
+    'linge-de-bain': 0.88,
+    'linge-de-table': 0.85,
+    'decoration': 0.82,
+    'senteurs-bougies': 0.78,
+    'esteban-parfums': 0.76,
+    'mobilier': 0.75,
+    'accessoires-sdb': 0.72,
+    'pyjama-homewear': 0.70,
+  }
+
+  const categories = Object.entries(categoryPriorities).map(([cat, priority]) => ({
     url: `${base}/boutique/${cat}`,
-    priority: 0.8,
+    priority,
     changeFrequency: 'weekly' as const,
   }))
 
-  const brands = [
-    'descamps', 'le-jacquard-francais', 'esteban-parfums', 'aquanova',
-    'blomus', 'cosmic', 'pilus', 'brun-de-vian-tiran', 'ilum',
-    'oscar', 'geodesis', 'la-savonnerie-royale', 'treca', 'vispring',
-    'pyrenex', 'tom-dixon', 'bolia', 'gubi', 'hay',
-  ].map(brand => ({
+  // Marques par priorité SEO (notoriété + volume de recherche)
+  const brandPriorities: Record<string, number> = {
+    'descamps': 0.92,
+    'treca': 0.88,
+    'pyrenex': 0.85,
+    'le-jacquard-francais': 0.83,
+    'esteban-parfums': 0.80,
+    'aquanova': 0.76,
+    'vispring': 0.74,
+    'brun-de-vian-tiran': 0.72,
+    'blomus': 0.70,
+    'pilus': 0.68,
+    'la-savonnerie-royale': 0.68,
+    'geodesis': 0.66,
+    'cosmic': 0.65,
+    'ilum': 0.65,
+    'oscar': 0.65,
+  }
+
+  const brands = Object.entries(brandPriorities).map(([brand, priority]) => ({
     url: `${base}/marques/${brand}`,
-    priority: 0.7,
+    priority,
     changeFrequency: 'weekly' as const,
   }))
 
@@ -43,23 +67,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ])
 
   const productPages = products
-    .filter((p: any) => p.slug)
+    .filter((p: any) => p.slug && p.published !== false)
     .map((p: any) => ({
       url: `${base}/produit/${p.slug}`,
-      priority: 0.6,
+      priority: p.featured ? 0.75 : 0.65,
       changeFrequency: 'weekly' as const,
+      lastModified: p.updated_at ? new Date(p.updated_at) : now,
     }))
 
   const postPages = posts
-    .filter((p: any) => p.slug)
+    .filter((p: any) => p.slug && p.published !== false)
     .map((p: any) => ({
       url: `${base}/blog/${p.slug}`,
-      priority: 0.5,
+      priority: 0.60,
       changeFrequency: 'monthly' as const,
+      lastModified: p.updated_at ? new Date(p.updated_at) : p.created_at ? new Date(p.created_at) : now,
     }))
 
-  return [...staticPages, ...categories, ...brands, ...productPages, ...postPages].map(page => ({
+  const staticWithDate = [...staticPages, ...categories, ...brands].map(page => ({
     ...page,
     lastModified: now,
   }))
+
+  return [...staticWithDate, ...productPages, ...postPages]
 }

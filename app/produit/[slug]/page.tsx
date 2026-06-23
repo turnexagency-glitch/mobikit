@@ -11,18 +11,31 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const product = await getProductBySlug(params.slug)
   if (!product) return {}
-  const title = `${product.name} | ${product.brand || 'Mobikit'} — Linge de Maison Maroc`
+  const brandStr = product.brand ? ` ${product.brand}` : ''
+  const title = `${product.name}${brandStr} | Mobikit Maroc — Prix : ${product.price?.toLocaleString('fr-MA')} MAD`
+  const descFallback = `Achetez ${product.name}${brandStr} au Maroc chez Mobikit. Prix : ${product.price?.toLocaleString('fr-MA')} MAD. Livraison partout au Maroc sous 3 à 5 jours.`
   const description = product.description
-    ? product.description.slice(0, 155) + '...'
-    : `Achetez ${product.name} de ${product.brand || 'Mobikit'} au Maroc. Prix : ${product.price?.toLocaleString('fr-MA')} MAD. Livraison partout au Maroc.`
+    ? product.description.slice(0, 155) + (product.description.length > 155 ? '...' : '')
+    : descFallback
+  const keywords = [
+    product.name,
+    product.brand,
+    `${product.name} maroc`,
+    product.brand ? `${product.brand} maroc` : null,
+    product.brand ? `${product.brand} casablanca` : null,
+    'linge de maison maroc',
+    'mobikit',
+  ].filter(Boolean).join(', ')
   return {
     title,
     description,
+    keywords,
     openGraph: {
       title,
       description,
       url: `https://www.mobikit.ma/produit/${params.slug}`,
-      images: product.images?.[0] ? [{ url: product.images[0], alt: product.name }] : [],
+      images: product.images?.[0] ? [{ url: product.images[0], width: 800, height: 800, alt: `${product.name} — ${product.brand || 'Mobikit'} Maroc` }] : [],
+      type: 'website',
     },
     alternates: { canonical: `https://www.mobikit.ma/produit/${params.slug}` },
   }

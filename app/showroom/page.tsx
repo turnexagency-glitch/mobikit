@@ -5,10 +5,66 @@ import { MapPin, Clock, Phone, CalendarDays, ExternalLink } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Showroom Mobikit | Boutique Descamps Casablanca & Rabat',
-  description: 'Visitez nos points de vente Descamps à Casablanca et Rabat. Collections de linge de maison haut de gamme en exclusivité. Conseil personnalisé sur rendez-vous.',
-  openGraph: { title: 'Showroom | Mobikit', url: 'https://www.mobikit.ma/showroom' },
+  description: 'Visitez nos boutiques Descamps à Casablanca et Rabat. Linge de maison, literie et décoration haut de gamme. Conseil personnalisé par nos experts. Ouvert 6j/7.',
+  keywords: 'boutique linge maison casablanca, descamps casablanca, boutique descamps rabat, showroom linge maison maroc, magasin linge maison casablanca, mobikit casablanca',
+  openGraph: {
+    title: 'Boutiques Mobikit | Descamps Casablanca & Rabat',
+    description: 'Visitez nos showrooms de linge de maison haut de gamme à Casablanca et Rabat. Conseil personnalisé sur place.',
+    url: 'https://www.mobikit.ma/showroom',
+    images: [{ url: '/images/showroom-mobikit.webp', width: 1200, height: 630, alt: 'Showroom Mobikit Casablanca — Boutique Descamps Maroc' }],
+  },
   alternates: { canonical: 'https://www.mobikit.ma/showroom' },
 }
+
+const showroomSchema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ClothingStore',
+    name: 'Mobikit — Descamps Casablanca',
+    description: 'Boutique Descamps à Casablanca — Linge de maison, literie de luxe et décoration haut de gamme.',
+    url: 'https://www.mobikit.ma/showroom#casablanca',
+    telephone: '+212666427890',
+    email: 'contact@mobikit.ma',
+    image: 'https://www.mobikit.ma/images/showroom-mobikit.webp',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Casablanca',
+      addressRegion: 'Grand Casablanca',
+      addressCountry: 'MA',
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: 33.5764273, longitude: -7.6524132 },
+    openingHoursSpecification: [
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '09:00', closes: '12:30' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '15:00', closes: '19:30' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday'], opens: '09:00', closes: '19:30' },
+    ],
+    priceRange: '$$$$',
+    currenciesAccepted: 'MAD',
+    parentOrganization: { '@type': 'Organization', name: 'Mobikit Home Collections', url: 'https://www.mobikit.ma' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ClothingStore',
+    name: 'Mobikit — Descamps Rabat',
+    description: 'Boutique Descamps à Rabat — Linge de maison, literie et décoration haut de gamme.',
+    url: 'https://www.mobikit.ma/showroom#rabat',
+    telephone: '+212666427890',
+    email: 'contact@mobikit.ma',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Rabat',
+      addressRegion: 'Rabat-Salé-Kénitra',
+      addressCountry: 'MA',
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: 33.9545219, longitude: -6.8527329 },
+    openingHoursSpecification: [
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'], opens: '10:00', closes: '20:00' },
+    ],
+    priceRange: '$$$$',
+    currenciesAccepted: 'MAD',
+    parentOrganization: { '@type': 'Organization', name: 'Mobikit Home Collections', url: 'https://www.mobikit.ma' },
+  },
+]
 
 const photos = [
   '/images/showroom-mobikit.webp',
@@ -47,6 +103,7 @@ const locations = [
 export default function ShowroomPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(showroomSchema) }} />
       {/* Hero */}
       <section className="relative h-80 flex items-center justify-center overflow-hidden">
         <Image src="/images/descamps-bed-teal.webp" alt="Showroom Mobikit" fill className="object-cover" />

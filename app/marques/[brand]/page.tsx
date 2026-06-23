@@ -8,15 +8,38 @@ import { getBrand } from '@/data/brands'
 
 export const dynamic = 'force-dynamic'
 
+const brandKeywords: Record<string, string> = {
+  'descamps':               'Descamps Maroc, Descamps Casablanca, linge de maison Descamps Maroc, parure de lit Descamps, distributeur officiel Descamps Maroc, draps Descamps Maroc',
+  'treca':                  'Treca Paris Maroc, matelas Treca Maroc, literie Treca Casablanca, matelas luxe Maroc, Treca distributeur Maroc',
+  'pyrenex':                'Pyrenex Maroc, couette Pyrenex Maroc, duvet Pyrenex Casablanca, couette plumes luxe Maroc, oreiller Pyrenex Maroc',
+  'le-jacquard-francais':   'Le Jacquard Français Maroc, linge de table jacquard Maroc, nappe jacquard Maroc, serviette table jacquard, distributeur Jacquard Français Maroc',
+  'esteban-parfums':        'Esteban Parfums Maroc, diffuseur Esteban Casablanca, bougie Esteban Maroc, parfum intérieur Esteban Maroc',
+  'aquanova':               'Aquanova Maroc, serviette bain Aquanova Maroc, linge de bain Aquanova Casablanca, accessoires bain Aquanova',
+  'blomus':                 'Blomus Maroc, accessoires design Blomus, décoration Blomus Maroc, rangement design Maroc',
+  'vispring':               'Vispring Maroc, matelas Vispring Casablanca, literie Vispring luxe Maroc, matelas ressorts Vispring',
+  'brun-de-vian-tiran':     'Brun de Vian-Tiran Maroc, couette laine Maroc, couverture laine luxe Maroc, plaid laine Maroc',
+  'pilus':                  'Pilus Maroc, linge de bain Pilus, serviette Pilus Maroc',
+  'la-savonnerie-royale':   'La Savonnerie Royale Maroc, savon artisanal Maroc, cosmétique naturel Maroc',
+  'geodesis':               'Geodesis Maroc, bougie parfumée Geodesis Maroc, senteur maison Geodesis',
+  'cosmic':                 'Cosmic Maroc, décoration Cosmic Maroc',
+}
+
 export async function generateMetadata({ params }: { params: { brand: string } }): Promise<Metadata> {
   const localBrand = getBrand(params.brand)
   const name = localBrand?.name || params.brand
-  const title = `${name} au Maroc | Distributeur Officiel Mobikit`
-  const description = localBrand?.description?.slice(0, 155) || `Découvrez la collection ${name} au Maroc chez Mobikit, distributeur officiel. Linge de maison haut de gamme livré partout au Maroc.`
+  const title = `${name} au Maroc | Distributeur Officiel — Mobikit`
+  const description = localBrand?.description?.slice(0, 155) ||
+    `Achetez ${name} au Maroc chez Mobikit, distributeur officiel. Collections complètes de linge de maison haut de gamme avec livraison partout au Maroc.`
   return {
     title,
     description,
-    openGraph: { title, description, url: `https://www.mobikit.ma/marques/${params.brand}` },
+    keywords: brandKeywords[params.brand] || `${name} Maroc, ${name} Casablanca, linge de maison ${name} Maroc`,
+    openGraph: {
+      title,
+      description,
+      url: `https://www.mobikit.ma/marques/${params.brand}`,
+      images: [{ url: '/images/showroom-mobikit.webp', width: 1200, height: 630, alt: `${name} au Maroc — Mobikit` }],
+    },
     alternates: { canonical: `https://www.mobikit.ma/marques/${params.brand}` },
   }
 }

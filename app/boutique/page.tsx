@@ -4,9 +4,15 @@ import Link from 'next/link'
 import { getAllProducts } from '@/lib/supabase'
 
 export const metadata: Metadata = {
-  title: 'Boutique Linge de Maison Maroc | Mobikit',
-  description: 'Découvrez notre boutique en ligne : parures de lit, couettes, linge de bain, décoration et literie haut de gamme au Maroc. Livraison partout au Royaume.',
-  openGraph: { title: 'Boutique | Mobikit', url: 'https://www.mobikit.ma/boutique' },
+  title: 'Boutique Linge de Maison en Ligne au Maroc | Mobikit',
+  description: 'Commandez en ligne votre linge de maison haut de gamme au Maroc : parures de lit, couettes, draps, linge de bain, literie de luxe. Descamps, Treca, Pyrenex. Livraison partout au Royaume.',
+  keywords: 'boutique linge de maison maroc, acheter linge de maison maroc, parure de lit maroc, couette maroc, housse de couette maroc, draps luxe maroc, linge de bain maroc, literie maroc, décoration maison maroc, linge de lit descamps maroc',
+  openGraph: {
+    title: 'Boutique Linge de Maison Haut de Gamme au Maroc | Mobikit',
+    description: 'Parures de lit, couettes, linge de bain, literie de luxe. Descamps, Treca, Pyrenex. Livraison partout au Maroc.',
+    url: 'https://www.mobikit.ma/boutique',
+    images: [{ url: '/images/showroom-mobikit.webp', width: 1200, height: 630, alt: 'Boutique Mobikit — Linge de Maison Maroc' }],
+  },
   alternates: { canonical: 'https://www.mobikit.ma/boutique' },
 }
 
@@ -23,11 +29,27 @@ const categories = [
 
 export const dynamic = 'force-dynamic'
 
+const boutiqueSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Boutique Linge de Maison Maroc — Mobikit',
+  description: 'Linge de maison haut de gamme au Maroc : parures de lit, couettes, linge de bain, literie de luxe. Distributeur officiel Descamps, Treca, Pyrenex.',
+  url: 'https://www.mobikit.ma/boutique',
+  breadcrumb: {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://www.mobikit.ma' },
+      { '@type': 'ListItem', position: 2, name: 'Boutique', item: 'https://www.mobikit.ma/boutique' },
+    ],
+  },
+}
+
 export default async function BoutiquePage() {
   const products = await getAllProducts()
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(boutiqueSchema) }} />
       <section className="bg-cream py-16 px-6 text-center">
         <p className="section-subtitle mb-3">Découvrez</p>
         <h1 className="section-title">Notre Boutique</h1>

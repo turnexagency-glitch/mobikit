@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Star, Truck, Shield, RefreshCw, Headphones } from 'lucide-react'
@@ -5,6 +6,19 @@ import SmartImage from '@/components/SmartImage'
 import { getFeaturedProducts, getAllPosts } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Mobikit | Linge de Maison Haut de Gamme au Maroc — Descamps, Treca, Pyrenex',
+  description: 'Achetez en ligne votre linge de maison haut de gamme au Maroc. Parures de lit, couettes, linge de bain, literie de luxe. Distributeur officiel Descamps, Treca Paris, Pyrenex à Casablanca. Livraison partout au Maroc.',
+  keywords: 'linge de maison maroc, linge de maison casablanca, descamps maroc, parure de lit maroc, couette maroc, literie luxe maroc, linge de bain maroc, boutique linge maison en ligne maroc, treca paris maroc, pyrenex maroc, housse de couette maroc, draps luxe maroc, décoration maison maroc',
+  openGraph: {
+    title: 'Mobikit | Linge de Maison Haut de Gamme — Descamps, Treca, Pyrenex au Maroc',
+    description: 'Boutique en ligne de linge de maison haut de gamme au Maroc. Parures, couettes, literie et décoration. Livraison partout au Royaume.',
+    url: 'https://www.mobikit.ma',
+    images: [{ url: '/images/showroom-mobikit.webp', width: 1200, height: 630, alt: 'Mobikit — Boutique Linge de Maison Haut de Gamme au Maroc' }],
+  },
+  alternates: { canonical: 'https://www.mobikit.ma' },
+}
 
 const categories = [
   {

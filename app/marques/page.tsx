@@ -4,9 +4,15 @@ import Image from 'next/image'
 import { getAllBrands } from '@/lib/sanity'
 
 export const metadata: Metadata = {
-  title: 'Nos Marques | Descamps, Treca, Pyrenex, Le Jacquard Français — Mobikit Maroc',
-  description: 'Mobikit distribue officiellement au Maroc les plus grandes maisons françaises : Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums et bien d\'autres.',
-  openGraph: { title: 'Nos Marques | Mobikit', url: 'https://www.mobikit.ma/marques' },
+  title: 'Nos Marques | Descamps, Treca, Pyrenex, Le Jacquard Français au Maroc — Mobikit',
+  description: 'Mobikit est distributeur officiel au Maroc de Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums, Aquanova et plus. Linge de maison haut de gamme livré partout au Royaume.',
+  keywords: 'marques linge de maison maroc, descamps maroc distributeur, treca paris maroc, pyrenex maroc, le jacquard français maroc, esteban parfums maroc, aquanova maroc, marques luxe linge maison maroc',
+  openGraph: {
+    title: 'Grandes Marques de Linge de Maison au Maroc | Mobikit',
+    description: 'Distributeur officiel Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums au Maroc.',
+    url: 'https://www.mobikit.ma/marques',
+    images: [{ url: '/images/showroom-mobikit.webp', width: 1200, height: 630, alt: 'Marques Linge de Maison — Mobikit Maroc' }],
+  },
   alternates: { canonical: 'https://www.mobikit.ma/marques' },
 }
 import { brands as localBrands } from '@/data/brands'

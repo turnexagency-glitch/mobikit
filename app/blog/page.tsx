@@ -4,9 +4,15 @@ import Link from 'next/link'
 import { getAllPosts } from '@/lib/supabase'
 
 export const metadata: Metadata = {
-  title: 'Blog | Inspirations Linge de Maison & Décoration — Mobikit',
-  description: 'Conseils déco, guides d\'achat, tendances et inspirations pour votre intérieur. Comment choisir sa couette, dresser une belle table, décorer sa chambre...',
-  openGraph: { title: 'Blog Inspirations | Mobikit', url: 'https://www.mobikit.ma/blog' },
+  title: 'Blog Déco & Linge de Maison | Conseils, Guides & Inspirations — Mobikit',
+  description: 'Conseils d\'experts pour choisir votre linge de maison au Maroc : comment choisir une couette, entretenir ses draps Descamps, décorer sa chambre, dresser une belle table. Guides d\'achat et tendances déco.',
+  keywords: 'guide linge de maison maroc, comment choisir couette maroc, conseil linge de lit, entretien linge descamps, tendance déco maison maroc, inspiration chambre maroc, choisir matelas maroc',
+  openGraph: {
+    title: 'Blog — Inspirations & Conseils Linge de Maison | Mobikit',
+    description: 'Guides d\'achat, conseils d\'entretien et inspirations déco pour votre intérieur. Tout sur le linge de maison haut de gamme au Maroc.',
+    url: 'https://www.mobikit.ma/blog',
+    images: [{ url: '/images/showroom-mobikit.webp', width: 1200, height: 630, alt: 'Blog Mobikit — Inspirations Linge de Maison Maroc' }],
+  },
   alternates: { canonical: 'https://www.mobikit.ma/blog' },
 }
 

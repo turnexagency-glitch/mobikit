@@ -60,45 +60,73 @@ export const metadata: Metadata = {
   },
 }
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Store',
-  name: 'Mobikit Home Collections',
-  description: 'Distributeur officiel des plus grandes marques européennes de linge de maison, literie, mobilier et décoration au Maroc. Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums.',
-  url: 'https://www.mobikit.ma',
-  telephone: '+212666427890',
-  email: 'contact@mobikit.ma',
-  image: 'https://www.mobikit.ma/images/showroom-mobikit.webp',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Résidence Yasmine, 45 Bd Ghandi',
-    addressLocality: 'Casablanca',
-    addressRegion: 'Casablanca-Settat',
-    postalCode: '20100',
-    addressCountry: 'MA',
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Mobikit Home Collections',
+    url: 'https://www.mobikit.ma',
+    description: 'Boutique en ligne de linge de maison haut de gamme au Maroc — Descamps, Treca Paris, Pyrenex, Le Jacquard Français.',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: { '@type': 'EntryPoint', urlTemplate: 'https://www.mobikit.ma/boutique?q={search_term_string}' },
+      'query-input': 'required name=search_term_string',
+    },
   },
-  geo: { '@type': 'GeoCoordinates', latitude: 33.5764273, longitude: -7.6524132 },
-  openingHoursSpecification: [
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '09:00', closes: '12:30' },
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '15:00', closes: '19:30' },
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday'], opens: '09:00', closes: '19:30' },
-  ],
-  sameAs: [
-    'https://www.instagram.com/descamps_maroc/',
-    'https://www.facebook.com/p/descamps_maroc-100064763023390/',
-    'https://www.linkedin.com/company/mobikit-sarl/',
-  ],
-  priceRange: '$$$$',
-  currenciesAccepted: 'MAD',
-  paymentAccepted: 'Cash',
-  areaServed: ['Casablanca', 'Rabat', 'Marrakech', 'Tanger', 'Agadir', 'Maroc'],
-}
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Store',
+    '@id': 'https://www.mobikit.ma/#store',
+    name: 'Mobikit Home Collections',
+    description: 'Distributeur officiel des plus grandes marques européennes de linge de maison, literie, mobilier et décoration au Maroc. Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums.',
+    url: 'https://www.mobikit.ma',
+    telephone: '+212666427890',
+    email: 'contact@mobikit.ma',
+    image: 'https://www.mobikit.ma/images/showroom-mobikit.webp',
+    logo: 'https://www.mobikit.ma/favicon.svg',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Résidence Yasmine, 45 Bd Ghandi',
+      addressLocality: 'Casablanca',
+      addressRegion: 'Casablanca-Settat',
+      postalCode: '20100',
+      addressCountry: 'MA',
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: 33.5764273, longitude: -7.6524132 },
+    openingHoursSpecification: [
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '09:00', closes: '12:30' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '15:00', closes: '19:30' },
+      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday'], opens: '09:00', closes: '19:30' },
+    ],
+    sameAs: [
+      'https://www.instagram.com/descamps_maroc/',
+      'https://www.facebook.com/p/descamps_maroc-100064763023390/',
+      'https://www.linkedin.com/company/mobikit-sarl/',
+    ],
+    priceRange: '$$$$',
+    currenciesAccepted: 'MAD',
+    paymentAccepted: 'Cash',
+    areaServed: ['Casablanca', 'Rabat', 'Marrakech', 'Tanger', 'Agadir', 'Maroc'],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Linge de Maison Haut de Gamme',
+      itemListElement: [
+        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Linge de Lit', description: 'Parures, draps et housses de couette Descamps' } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Literie de Luxe', description: 'Matelas Treca Paris, couettes Pyrenex' } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Linge de Bain', description: 'Serviettes et peignoirs de bain haut de gamme' } },
+        { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Linge de Table', description: 'Nappes et serviettes Le Jacquard Français' } },
+      ],
+    },
+  },
+]
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="preconnect" href="https://aeoyymwekjvtzgpctvqu.supabase.co" />
         <CartProvider>
           <Header />
           <CartDrawer />
