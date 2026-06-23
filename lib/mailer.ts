@@ -9,10 +9,14 @@ interface MailOptions {
 }
 
 export async function sendMail({ to, subject, html, replyTo, fromName = 'Mobikit' }: MailOptions) {
+  const apiKey = process.env.BREVO_API_KEY
+  console.log('[Brevo] apiKey present:', !!apiKey, '| to:', to)
+  if (!apiKey) throw new Error('BREVO_API_KEY manquante')
+
   const res = await fetch(BREVO_API, {
     method: 'POST',
     headers: {
-      'api-key': process.env.BREVO_API_KEY!,
+      'api-key': apiKey,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
