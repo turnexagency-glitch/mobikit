@@ -231,7 +231,7 @@ export default async function HomePage() {
                 <Link key={product.id} href={`/produit/${product.slug}`} className="group cursor-pointer block">
                   <div className="relative overflow-hidden aspect-[3/4] mb-4 bg-cream">
                     {product.images?.[0]
-                      ? <Image src={product.images[0]} alt={product.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                      ? <Image src={product.images[0]} alt={product.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                       : <div className="w-full h-full bg-cream-dark" />
                     }
                     {product.badge && (

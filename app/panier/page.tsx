@@ -85,7 +85,7 @@ export default function PanierPage() {
                   <div key={item.id} className="flex gap-4 p-4 border border-cream-dark bg-white">
                     <div className="relative w-24 h-24 flex-shrink-0 overflow-hidden bg-cream">
                       {item.image
-                        ? <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        ? <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" />
                         : <div className="w-full h-full bg-cream-dark" />
                       }
                     </div>
