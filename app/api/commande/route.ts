@@ -110,7 +110,7 @@ function emailClient(data: {
                 Mobikit Home Collections · Casablanca, Maroc
               </p>
               <p style="font-size:10px;color:#6b7280;margin:0;">
-                <a href="mailto:mobikit@mobikit.ma" style="color:#C4A35A;text-decoration:none;">mobikit@mobikit.ma</a>
+                <a href="mailto:contact@mobikit.ma" style="color:#C4A35A;text-decoration:none;">contact@mobikit.ma</a>
               </p>
             </td>
           </tr>

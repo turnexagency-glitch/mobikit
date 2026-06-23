@@ -69,7 +69,7 @@ export default function Header() {
             </span>
             <span className="flex items-center gap-2 text-cream">
               <Mail size={11} />
-              mobikit@mobikit.ma
+              contact@mobikit.ma
             </span>
           </div>
           <p className="tracking-widest uppercase text-gold text-[10px]">

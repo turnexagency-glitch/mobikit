@@ -67,7 +67,7 @@ const jsonLd = {
   description: 'Distributeur officiel des plus grandes marques européennes de linge de maison, literie, mobilier et décoration au Maroc. Descamps, Treca Paris, Pyrenex, Le Jacquard Français, Esteban Parfums.',
   url: 'https://www.mobikit.ma',
   telephone: '+212666427890',
-  email: 'mobikit@mobikit.ma',
+  email: 'contact@mobikit.ma',
   image: 'https://www.mobikit.ma/images/showroom-mobikit.webp',
   address: {
     '@type': 'PostalAddress',
