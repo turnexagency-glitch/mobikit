@@ -1,4 +1,7 @@
-const BREVO_API = 'https://api.brevo.com/v3/smtp/email'
+import https from 'https'
+
+const BREVO_HOST = 'api.brevo.com'
+const BREVO_PATH = '/v3/smtp/email'
 
 interface MailOptions {
   to: string
@@ -8,28 +11,44 @@ interface MailOptions {
   fromName?: string
 }
 
-export async function sendMail({ to, subject, html, replyTo, fromName = 'Mobikit' }: MailOptions) {
-  const apiKey = process.env.BREVO_API_KEY
-  console.log('[Brevo] apiKey present:', !!apiKey, '| to:', to)
-  if (!apiKey) throw new Error('BREVO_API_KEY manquante')
+export function sendMail({ to, subject, html, replyTo, fromName = 'Mobikit' }: MailOptions): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const apiKey = process.env.BREVO_API_KEY
+    if (!apiKey) return reject(new Error('BREVO_API_KEY manquante'))
 
-  const res = await fetch(BREVO_API, {
-    method: 'POST',
-    headers: {
-      'api-key': apiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+    const payload = JSON.stringify({
       sender: { name: fromName, email: 'turnexagency@gmail.com' },
       to: [{ email: to }],
       ...(replyTo ? { replyTo: { email: replyTo } } : {}),
       subject,
       htmlContent: html,
-    }),
-  })
+    })
 
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Brevo error ${res.status}: ${err}`)
-  }
+    const options = {
+      hostname: BREVO_HOST,
+      path: BREVO_PATH,
+      method: 'POST',
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    }
+
+    const req = https.request(options, (res) => {
+      let data = ''
+      res.on('data', chunk => { data += chunk })
+      res.on('end', () => {
+        if (res.statusCode && res.statusCode >= 400) {
+          reject(new Error(`Brevo error ${res.statusCode}: ${data}`))
+        } else {
+          resolve()
+        }
+      })
+    })
+
+    req.on('error', reject)
+    req.write(payload)
+    req.end()
+  })
 }
