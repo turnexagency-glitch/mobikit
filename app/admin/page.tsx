@@ -1,20 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@supabase/supabase-js'
 import {
-  Eye, EyeOff, Package, TrendingUp, Clock, CheckCircle, Truck, XCircle,
+  Package, TrendingUp, Clock, CheckCircle, Truck, XCircle,
   ShoppingBag, RefreshCw, Star, Globe, GlobeLock, BookOpen, Plus, Trash2,
-  Edit3, Search, Settings, Layout, Bell, Instagram, Facebook, ExternalLink,
-  Image as ImageIcon, Type, Phone, Mail, MapPin, Save, ChevronRight, Tag,
+  Edit3, Search, Layout, Bell, Instagram,
+  Image as ImageIcon, Phone, Mail, MapPin, Save, ChevronRight, Tag,
 } from 'lucide-react'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlb3l5bXdla2p2dHpncGN0dnF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDg0MjM3MywiZXhwIjoyMDk2NDE4MzczfQ.cI3Ww0KU8a6z5JOpvOgTozrnE3PyscELUAc-FZLpzOM'
-)
-
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'mobikit2025'
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   pending:   { label: 'En attente',   color: 'bg-yellow-100 text-yellow-700', icon: Clock },
@@ -26,12 +18,19 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
 
 type Tab = 'commandes' | 'produits' | 'blog' | 'contenu' | 'seo'
 
+const PAGE_SIZE = 50
+
+async function adminFetch(path: string, options?: RequestInit) {
+  const res = await fetch(path, options)
+  if (res.status === 401) {
+    window.location.href = '/admin/login'
+    return null
+  }
+  return res
+}
+
 export default function AdminPage() {
   const router = useRouter()
-  const [password, setPassword] = useState('')
-  const [showPwd, setShowPwd] = useState(false)
-  const [auth, setAuth] = useState(false)
-  const [error, setError] = useState('')
   const [tab, setTab] = useState<Tab>('commandes')
 
   // Commandes
@@ -48,7 +47,6 @@ export default function AdminPage() {
   const [prodPage, setProdPage] = useState(0)
   const [prodTotal, setProdTotal] = useState(0)
   const [prodFilter, setProdFilter] = useState<'all' | 'published' | 'hidden'>('all')
-  const PAGE_SIZE = 50
 
   // Blog
   const [posts, setPosts] = useState<any[]>([])
@@ -56,32 +54,39 @@ export default function AdminPage() {
   const [editPost, setEditPost] = useState<any>(null)
   const [newPost, setNewPost] = useState(false)
 
-  // Settings (Contenu + SEO)
+  // Settings
   const [settings, setSettings] = useState<Record<string, any>>({})
   const [settingsLoading, setSettingsLoading] = useState(false)
   const [saving, setSaving] = useState<string | null>(null)
   const [saved, setSaved] = useState<string | null>(null)
 
-  const login = () => {
-    if (password === ADMIN_PASSWORD) { setAuth(true); setError(''); loadOrders() }
-    else setError('Mot de passe incorrect')
-  }
-
   const revalidate = async () => {
     await fetch('/api/revalidate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).catch(() => {})
+  }
+
+  const logout = async () => {
+    await fetch('/api/admin/logout', { method: 'POST' })
+    router.push('/admin/login')
   }
 
   // ─── Commandes ───────────────────────────────────────────────────────────────
   const loadOrders = async () => {
     setOrdersLoading(true)
-    const { data } = await supabaseAdmin.from('orders').select('*').order('created_at', { ascending: false })
-    setOrders(data || [])
+    const res = await adminFetch('/api/admin/orders')
+    if (res?.ok) {
+      const { data } = await res.json()
+      setOrders(data || [])
+    }
     setOrdersLoading(false)
   }
 
   const updateStatus = async (id: string, status: string) => {
     setUpdating(true)
-    await supabaseAdmin.from('orders').update({ status }).eq('id', id)
+    await adminFetch('/api/admin/orders', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    })
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
     if (selected?.id === id) setSelected((s: any) => ({ ...s, status }))
     setUpdating(false)
@@ -90,50 +95,55 @@ export default function AdminPage() {
   // ─── Produits ────────────────────────────────────────────────────────────────
   const loadProducts = async (q = '', page = 0, f = prodFilter) => {
     setProdLoading(true)
-    const from = page * PAGE_SIZE
-    const to = from + PAGE_SIZE - 1
-    let query = supabaseAdmin
-      .from('products')
-      .select('id, name, brand, category, price, published, featured, in_stock, sage_ref', { count: 'exact' })
-      .order('name', { ascending: true })
-      .range(from, to)
-    if (q) query = query.ilike('name', `%${q}%`)
-    if (f === 'published') query = query.eq('published', true)
-    if (f === 'hidden') query = query.eq('published', false)
-    const { data, count } = await query
-    setProducts(data || [])
-    setProdTotal(count || 0)
-    setProdPage(page)
+    const params = new URLSearchParams({ q, page: String(page), filter: f })
+    const res = await adminFetch(`/api/admin/products?${params}`)
+    if (res?.ok) {
+      const { data, count } = await res.json()
+      setProducts(data || [])
+      setProdTotal(count || 0)
+      setProdPage(page)
+    }
     setProdLoading(false)
   }
 
-  const toggleProduct = async (id: string, field: 'published' | 'featured', val: boolean) => {
-    await supabaseAdmin.from('products').update({ [field]: val }).eq('id', id)
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: val } : p))
+  const toggleProduct = async (id: string, field: 'published' | 'featured', value: boolean) => {
+    await adminFetch('/api/admin/products', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, field, value }),
+    })
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p))
     await revalidate()
   }
 
   // ─── Blog ────────────────────────────────────────────────────────────────────
   const loadPosts = async () => {
     setBlogLoading(true)
-    const { data } = await supabaseAdmin.from('posts').select('*').order('created_at', { ascending: false })
-    setPosts(data || [])
+    const res = await adminFetch('/api/admin/blog')
+    if (res?.ok) {
+      const { data } = await res.json()
+      setPosts(data || [])
+    }
     setBlogLoading(false)
   }
 
   const savePost = async (post: any) => {
-    if (post.id) {
-      await supabaseAdmin.from('posts').update({ ...post, updated_at: new Date().toISOString() }).eq('id', post.id)
-    } else {
-      await supabaseAdmin.from('posts').insert({ ...post, created_at: new Date().toISOString() })
-    }
+    await adminFetch('/api/admin/blog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post),
+    })
     await revalidate()
     setEditPost(null); setNewPost(false); loadPosts()
   }
 
   const deletePost = async (id: string) => {
     if (!confirm('Supprimer cet article ?')) return
-    await supabaseAdmin.from('posts').delete().eq('id', id)
+    await adminFetch('/api/admin/blog', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
     await revalidate()
     loadPosts()
   }
@@ -141,14 +151,21 @@ export default function AdminPage() {
   // ─── Settings ────────────────────────────────────────────────────────────────
   const loadSettings = async () => {
     setSettingsLoading(true)
-    const { data } = await supabaseAdmin.from('settings').select('key, value')
-    if (data) setSettings(Object.fromEntries(data.map(({ key, value }) => [key, value])))
+    const res = await adminFetch('/api/admin/settings')
+    if (res?.ok) {
+      const { data } = await res.json()
+      if (data) setSettings(Object.fromEntries(data.map(({ key, value }: any) => [key, value])))
+    }
     setSettingsLoading(false)
   }
 
   const saveSetting = async (key: string, value: any) => {
     setSaving(key)
-    await supabaseAdmin.from('settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    await adminFetch('/api/admin/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value }),
+    })
     setSettings(prev => ({ ...prev, [key]: value }))
     await revalidate()
     setSaving(null)
@@ -161,9 +178,10 @@ export default function AdminPage() {
   }
 
   // ─── Effects ─────────────────────────────────────────────────────────────────
-  useEffect(() => { if (auth && tab === 'produits') loadProducts('', 0, prodFilter) }, [tab, auth])
-  useEffect(() => { if (auth && tab === 'blog') loadPosts() }, [tab, auth])
-  useEffect(() => { if (auth && (tab === 'contenu' || tab === 'seo')) loadSettings() }, [tab, auth])
+  useEffect(() => { loadOrders() }, [])
+  useEffect(() => { if (tab === 'produits') loadProducts('', 0, prodFilter) }, [tab])
+  useEffect(() => { if (tab === 'blog') loadPosts() }, [tab])
+  useEffect(() => { if (tab === 'contenu' || tab === 'seo') loadSettings() }, [tab])
 
   const stats = {
     total: orders.length,
@@ -181,32 +199,6 @@ export default function AdminPage() {
     { key: 'seo',       label: 'SEO',        icon: Globe },
   ]
 
-  // ─── Login ───────────────────────────────────────────────────────────────────
-  if (!auth) return (
-    <div className="min-h-screen bg-cream flex items-center justify-center px-6">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="font-serif text-3xl font-light text-charcoal">Mobikit</div>
-          <div className="text-[10px] tracking-ultra-wide uppercase text-gold mt-1">Administration</div>
-        </div>
-        <div className="bg-white p-8 border border-cream-dark">
-          <div className="relative mb-4">
-            <input type={showPwd ? 'text' : 'password'} value={password}
-              onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === 'Enter' && login()}
-              placeholder="Mot de passe"
-              className="w-full border border-cream-dark px-4 py-3 text-sm focus:outline-none focus:border-gold pr-10" />
-            <button onClick={() => setShowPwd(!showPwd)} className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-light">
-              {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
-          {error && <p className="text-xs text-red-500 mb-3">{error}</p>}
-          <button onClick={login} className="btn-primary w-full">Connexion</button>
-        </div>
-      </div>
-    </div>
-  )
-
-  // ─── Admin ───────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -220,7 +212,7 @@ export default function AdminPage() {
                 <Icon size={12} /> {label}
               </button>
             ))}
-            <button onClick={() => setAuth(false)} className="ml-2 text-xs text-gray-500 hover:text-white border border-gray-600 px-3 py-1.5 rounded">Déconnexion</button>
+            <button onClick={logout} className="ml-2 text-xs text-gray-500 hover:text-white border border-gray-600 px-3 py-1.5 rounded">Déconnexion</button>
           </div>
         </div>
       </div>
@@ -468,7 +460,6 @@ export default function AdminPage() {
           <div className="space-y-6">
             <h2 className="font-serif text-xl font-light text-charcoal flex items-center gap-2"><Layout size={18} className="text-gold" /> Contenu du Site</h2>
 
-            {/* ─ Bannière ─ */}
             <Section title="Bannière d'annonce" icon={<Bell size={15} className="text-gold" />}>
               <Field label="Texte de la bannière">
                 <input value={settings.banner?.text || ''} onChange={e => us('banner', 'text', e.target.value)}
@@ -482,7 +473,6 @@ export default function AdminPage() {
               <SaveBtn keyName="banner" value={settings.banner} onSave={saveSetting} saving={saving} saved={saved} />
             </Section>
 
-            {/* ─ Hero Homepage ─ */}
             <Section title="Hero — Page d'accueil" icon={<ImageIcon size={15} className="text-gold" />}>
               <div className="grid md:grid-cols-2 gap-4">
                 <Field label="Titre principal">
@@ -509,7 +499,6 @@ export default function AdminPage() {
               <SaveBtn keyName="hero" value={settings.hero} onSave={saveSetting} saving={saving} saved={saved} />
             </Section>
 
-            {/* ─ Contact ─ */}
             <Section title="Informations de contact" icon={<Phone size={15} className="text-gold" />}>
               <div className="grid md:grid-cols-2 gap-4">
                 <Field label="Téléphone">
@@ -530,7 +519,7 @@ export default function AdminPage() {
                   <div className="relative">
                     <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
                     <input value={settings.contact?.email || ''} onChange={e => us('contact', 'email', e.target.value)}
-                      placeholder="mobikit@mobikit.ma" className="input-admin pl-8" />
+                      placeholder="contact@mobikit.ma" className="input-admin pl-8" />
                   </div>
                 </Field>
                 <Field label="Adresse">
@@ -544,7 +533,6 @@ export default function AdminPage() {
               <SaveBtn keyName="contact" value={settings.contact} onSave={saveSetting} saving={saving} saved={saved} />
             </Section>
 
-            {/* ─ Réseaux Sociaux ─ */}
             <Section title="Réseaux Sociaux" icon={<Instagram size={15} className="text-gold" />}>
               <div className="grid md:grid-cols-2 gap-4">
                 {[
@@ -572,7 +560,6 @@ export default function AdminPage() {
           <div className="space-y-6">
             <h2 className="font-serif text-xl font-light text-charcoal flex items-center gap-2"><Globe size={18} className="text-gold" /> Référencement (SEO)</h2>
 
-            {/* ─ SEO Global ─ */}
             <Section title="SEO Global" icon={<Globe size={15} className="text-gold" />}>
               <div className="space-y-4">
                 <Field label="Nom du site">
@@ -588,9 +575,9 @@ export default function AdminPage() {
                 <Field label="Mots-clés principaux (séparés par des virgules)">
                   <textarea value={settings.seo_global?.keywords || ''} onChange={e => us('seo_global', 'keywords', e.target.value)}
                     rows={3} className="input-admin resize-none font-mono text-xs"
-                    placeholder="linge de maison maroc, descamps maroc, literie luxe maroc, couette maroc, parure de lit maroc..." />
+                    placeholder="linge de maison maroc, descamps maroc, literie luxe maroc..." />
                   <p className="text-[10px] text-charcoal-light mt-1">
-                    {(settings.seo_global?.keywords || '').split(',').filter((k: string) => k.trim()).length} mot(s)-clé(s) · Google utilise surtout le titre et la description, mais les mots-clés restent utiles pour Bing et les autres moteurs.
+                    {(settings.seo_global?.keywords || '').split(',').filter((k: string) => k.trim()).length} mot(s)-clé(s)
                   </p>
                 </Field>
                 <Field label="Image OG (partagée sur réseaux sociaux)">
@@ -603,24 +590,20 @@ export default function AdminPage() {
                   )}
                 </Field>
               </div>
-
-              {/* Aperçu Google */}
               <div className="mt-4 bg-white border border-gray-200 rounded-lg p-4">
                 <p className="text-[10px] uppercase tracking-widests text-charcoal-light mb-3 font-medium">Aperçu Google</p>
                 <p className="text-blue-600 text-sm font-medium">{settings.seo_global?.site_name || 'Mobikit Home Collections'} | Linge de Maison au Maroc</p>
                 <p className="text-green-700 text-xs">mobikit.ma</p>
                 <p className="text-charcoal-light text-xs mt-1 leading-relaxed">{settings.seo_global?.default_description || 'Aucune description...'}</p>
               </div>
-
               <SaveBtn keyName="seo_global" value={settings.seo_global} onSave={saveSetting} saving={saving} saved={saved} />
             </Section>
 
-            {/* ─ SEO par Page ─ */}
             <Section title="SEO par Page" icon={<Tag size={15} className="text-gold" />}>
               <div className="space-y-4">
                 <p className="text-xs text-charcoal-light">Pour les pages produit et blog, le SEO est géré directement depuis l&apos;éditeur de chaque contenu.</p>
                 {[
-                  { key: 'seo_homepage', label: 'Page d\'Accueil', url: '/' },
+                  { key: 'seo_homepage', label: "Page d'Accueil", url: '/' },
                   { key: 'seo_boutique', label: 'Boutique', url: '/boutique' },
                   { key: 'seo_marques',  label: 'Nos Marques', url: '/marques' },
                   { key: 'seo_blog',     label: 'Blog', url: '/blog' },
@@ -646,7 +629,7 @@ export default function AdminPage() {
                       </Field>
                       <Field label="Mots-clés (séparés par virgules)" className="md:col-span-2">
                         <input value={settings[key]?.keywords || ''} onChange={e => us(key, 'keywords', e.target.value)}
-                          placeholder="ex: linge de lit casablanca, parure de lit maroc, descamps maroc..."
+                          placeholder="ex: linge de lit casablanca, parure de lit maroc..."
                           className="input-admin text-xs" />
                       </Field>
                     </div>
@@ -714,7 +697,6 @@ function SaveBtn({ keyName, value, onSave, saving, saved, small = false }: {
   )
 }
 
-// ─── ImageUploader ────────────────────────────────────────────────────────────
 function ImageUploader({ value, onChange }: { value: string; onChange: (url: string) => void }) {
   const [dragging, setDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -722,13 +704,13 @@ function ImageUploader({ value, onChange }: { value: string; onChange: (url: str
   const upload = async (file: File) => {
     if (!file.type.startsWith('image/')) return
     setUploading(true)
-    const ext = file.name.split('.').pop()
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const client = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlb3l5bXdla2p2dHpncGN0dnF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDg0MjM3MywiZXhwIjoyMDk2NDE4MzczfQ.cI3Ww0KU8a6z5JOpvOgTozrnE3PyscELUAc-FZLpzOM')
-    const { error } = await client.storage.from('blog-images').upload(filename, file)
-    if (!error) {
-      const { data } = client.storage.from('blog-images').getPublicUrl(filename)
-      onChange(data.publicUrl)
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('bucket', 'blog-images')
+    const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+    if (res.ok) {
+      const { url } = await res.json()
+      onChange(url)
     }
     setUploading(false)
   }
@@ -768,7 +750,6 @@ function ImageUploader({ value, onChange }: { value: string; onChange: (url: str
   )
 }
 
-// ─── PostForm ─────────────────────────────────────────────────────────────────
 function PostForm({ post, onSave, onCancel }: { post: any; onSave: (p: any) => void; onCancel: () => void }) {
   const [form, setForm] = useState(post)
   const u = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }))

@@ -1,18 +1,11 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { createClient } from '@supabase/supabase-js'
 import { useParams, useRouter } from 'next/navigation'
-import Image from 'next/image'
 import {
-  ArrowLeft, Save, Upload, Trash2, GripVertical, Plus, X,
+  ArrowLeft, Save, Upload, Trash2, Plus, X,
   Globe, Eye, EyeOff, Star, Package, Tag, Image as ImageIcon,
-  Search, FileText, Settings
+  Search,
 } from 'lucide-react'
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlb3l5bXdla2p2dHpncGN0dnF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDg0MjM3MywiZXhwIjoyMDk2NDE4MzczfQ.cI3Ww0KU8a6z5JOpvOgTozrnE3PyscELUAc-FZLpzOM'
-)
 
 const CATEGORIES = [
   { value: 'linge-de-lit',     label: 'Linge de Lit' },
@@ -36,11 +29,20 @@ const BRANDS = [
 const BADGES = ['Nouveau','Bestseller','Exclusif','Promo','Premium']
 
 const TABS = [
-  { id: 'general',   label: 'Général',    icon: Package },
-  { id: 'images',    label: 'Photos',     icon: ImageIcon },
-  { id: 'variants',  label: 'Variantes',  icon: Tag },
-  { id: 'seo',       label: 'SEO',        icon: Search },
+  { id: 'general',  label: 'Général',   icon: Package },
+  { id: 'images',   label: 'Photos',    icon: ImageIcon },
+  { id: 'variants', label: 'Variantes', icon: Tag },
+  { id: 'seo',      label: 'SEO',       icon: Search },
 ]
+
+async function adminFetch(path: string, options?: RequestInit) {
+  const res = await fetch(path, options)
+  if (res.status === 401) {
+    window.location.href = '/admin/login'
+    return null
+  }
+  return res
+}
 
 export default function ProductEditPage() {
   const params = useParams()
@@ -56,13 +58,14 @@ export default function ProductEditPage() {
   const [newColor, setNewColor] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    loadProduct()
-  }, [params.id])
+  useEffect(() => { loadProduct() }, [params.id])
 
   const loadProduct = async () => {
-    const { data } = await supabaseAdmin.from('products').select('*').eq('id', params.id).single()
-    setProduct(data)
+    const res = await adminFetch(`/api/admin/products/${params.id}`)
+    if (res?.ok) {
+      const { data } = await res.json()
+      setProduct(data)
+    }
     setLoading(false)
   }
 
@@ -74,24 +77,11 @@ export default function ProductEditPage() {
 
   const save = async () => {
     setSaving(true)
-    await supabaseAdmin.from('products').update({
-      name: product.name,
-      brand: product.brand,
-      category: product.category,
-      price: product.price,
-      old_price: product.old_price || null,
-      badge: product.badge || null,
-      description: product.description || null,
-      published: product.published,
-      featured: product.featured,
-      in_stock: product.in_stock,
-      images: product.images || [],
-      sizes: product.sizes || [],
-      colors: product.colors || [],
-      slug: product.slug,
-      seo_title: product.seo_title || null,
-      seo_description: product.seo_description || null,
-    }).eq('id', product.id)
+    await adminFetch(`/api/admin/products/${product.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(product),
+    })
     await revalidate()
     setSaving(false)
     setSaved(true)
@@ -101,12 +91,13 @@ export default function ProductEditPage() {
   const uploadImage = async (file: File) => {
     if (!file.type.startsWith('image/')) return
     setUploadingImg(true)
-    const ext = file.name.split('.').pop()
-    const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { error } = await supabaseAdmin.storage.from('product-images').upload(filename, file)
-    if (!error) {
-      const { data } = supabaseAdmin.storage.from('product-images').getPublicUrl(filename)
-      u('images', [...(product.images || []), data.publicUrl])
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('bucket', 'product-images')
+    const res = await adminFetch('/api/admin/upload', { method: 'POST', body: formData })
+    if (res?.ok) {
+      const { url } = await res.json()
+      u('images', [...(product.images || []), url])
     }
     setUploadingImg(false)
   }
@@ -163,7 +154,6 @@ export default function ProductEditPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Statut rapide */}
             <button onClick={() => u('published', !product.published)}
               className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded transition-colors ${product.published ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
               {product.published ? <><Globe size={12} /> Publié</> : <><EyeOff size={12} /> Masqué</>}
@@ -186,7 +176,6 @@ export default function ProductEditPage() {
 
           {/* Contenu principal */}
           <div className="flex-1 min-w-0">
-            {/* Onglets */}
             <div className="flex gap-1 mb-6 bg-white border border-gray-100 rounded-lg p-1 w-fit">
               {TABS.map(t => (
                 <button key={t.id} onClick={() => setTab(t.id)}
@@ -263,9 +252,7 @@ export default function ProductEditPage() {
             {tab === 'images' && (
               <div className="bg-white border border-gray-100 rounded-lg p-5 space-y-4">
                 <h3 className="font-medium text-charcoal text-sm border-b pb-3">Photos du produit</h3>
-                <p className="text-xs text-charcoal-light">La première photo est l'image principale affichée sur le site.</p>
-
-                {/* Zone upload */}
+                <p className="text-xs text-charcoal-light">La première photo est l&apos;image principale affichée sur le site.</p>
                 <div
                   onDragOver={e => { e.preventDefault(); setDragOver(true) }}
                   onDragLeave={() => setDragOver(false)}
@@ -289,7 +276,6 @@ export default function ProductEditPage() {
                     onChange={e => Array.from(e.target.files || []).forEach(uploadImage)} />
                 </div>
 
-                {/* Galerie */}
                 {product.images?.length > 0 && (
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-2">
                     {product.images.map((img: string, i: number) => (
@@ -300,11 +286,11 @@ export default function ProductEditPage() {
                         )}
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                           {i > 0 && (
-                            <button onClick={() => moveImage(i, i - 1)} className="bg-white text-charcoal p-1.5 rounded hover:bg-gray-100" title="Déplacer à gauche">←</button>
+                            <button onClick={() => moveImage(i, i - 1)} className="bg-white text-charcoal p-1.5 rounded hover:bg-gray-100">←</button>
                           )}
                           <button onClick={() => removeImage(i)} className="bg-red-500 text-white p-1.5 rounded hover:bg-red-600"><Trash2 size={12} /></button>
                           {i < product.images.length - 1 && (
-                            <button onClick={() => moveImage(i, i + 1)} className="bg-white text-charcoal p-1.5 rounded hover:bg-gray-100" title="Déplacer à droite">→</button>
+                            <button onClick={() => moveImage(i, i + 1)} className="bg-white text-charcoal p-1.5 rounded hover:bg-gray-100">→</button>
                           )}
                         </div>
                       </div>
@@ -386,8 +372,6 @@ export default function ProductEditPage() {
                     rows={3} className="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-gold rounded-lg resize-none" />
                   <p className="text-[10px] text-charcoal-light mt-1">{(product.seo_description || '').length}/160 caractères recommandés</p>
                 </div>
-
-                {/* Aperçu Google */}
                 <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                   <p className="text-[10px] uppercase tracking-widests text-charcoal-light mb-3">Aperçu Google</p>
                   <p className="text-blue-600 text-sm font-medium hover:underline cursor-pointer">{product.seo_title || product.name}</p>
@@ -400,8 +384,6 @@ export default function ProductEditPage() {
 
           {/* Sidebar droite */}
           <div className="w-64 flex-shrink-0 space-y-4">
-
-            {/* Statut */}
             <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-3">
               <h3 className="font-medium text-charcoal text-sm border-b pb-2">Statut</h3>
               <label className="flex items-center justify-between cursor-pointer">
@@ -427,7 +409,6 @@ export default function ProductEditPage() {
               </label>
             </div>
 
-            {/* Catégorie */}
             <div className="bg-white border border-gray-100 rounded-lg p-4 space-y-2">
               <h3 className="font-medium text-charcoal text-sm border-b pb-2">Catégorie</h3>
               <div className="space-y-1.5">
@@ -443,7 +424,6 @@ export default function ProductEditPage() {
               </div>
             </div>
 
-            {/* Image principale */}
             {product.images?.[0] && (
               <div className="bg-white border border-gray-100 rounded-lg p-4">
                 <h3 className="font-medium text-charcoal text-sm border-b pb-2 mb-3">Image principale</h3>
@@ -453,7 +433,6 @@ export default function ProductEditPage() {
               </div>
             )}
 
-            {/* Bouton enregistrer */}
             <button onClick={save} disabled={saving}
               className={`w-full flex items-center justify-center gap-2 py-3 text-sm font-medium rounded-lg transition-colors ${saving ? 'bg-gold/60 cursor-wait' : saved ? 'bg-green-600' : 'bg-gold hover:bg-gold-dark'} text-white`}>
               <Save size={15} />
@@ -462,7 +441,7 @@ export default function ProductEditPage() {
 
             <button onClick={() => router.push('/admin')}
               className="w-full py-2.5 text-xs text-charcoal-light border border-gray-200 rounded-lg hover:bg-gray-50">
-              ← Retour à l'admin
+              ← Retour à l&apos;admin
             </button>
           </div>
 
