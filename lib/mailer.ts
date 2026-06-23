@@ -13,7 +13,7 @@ interface MailOptions {
 
 export function sendMail({ to, subject, html, replyTo, fromName = 'Mobikit' }: MailOptions): Promise<void> {
   return new Promise((resolve, reject) => {
-    const apiKey = process.env.BREVO_API_KEY
+    const apiKey = process.env.BREVO_API_KEY?.trim().replace(/[\r\n]/g, '')
     if (!apiKey) return reject(new Error('BREVO_API_KEY manquante'))
 
     const payload = JSON.stringify({
