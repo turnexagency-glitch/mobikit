@@ -16,7 +16,7 @@ export async function sendMail({ to, subject, html, replyTo, fromName = 'Mobikit
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      sender: { name: fromName, email: 'contact@mobikit.ma' },
+      sender: { name: fromName, email: 'turnexagency@gmail.com' },
       to: [{ email: to }],
       ...(replyTo ? { replyTo: { email: replyTo } } : {}),
       subject,
