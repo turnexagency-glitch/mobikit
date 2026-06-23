@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendMail } from '@/lib/mailer'
+import { checkRateLimit } from '@/lib/rateLimit'
+
+const esc = (s: string) =>
+  String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,12 +22,12 @@ function emailClient(data: {
   const itemsHtml = data.items.map(i => `
     <tr>
       <td style="padding:10px 0;border-bottom:1px solid #f0ebe0;">
-        <span style="font-size:11px;color:#C4A35A;text-transform:uppercase;letter-spacing:2px;">${i.brand}</span><br>
-        <span style="font-size:13px;color:#1A1A1A;">${i.name}</span><br>
-        <span style="font-size:11px;color:#6b7280;">Qté : ${i.qty}</span>
+        <span style="font-size:11px;color:#C4A35A;text-transform:uppercase;letter-spacing:2px;">${esc(i.brand)}</span><br>
+        <span style="font-size:13px;color:#1A1A1A;">${esc(i.name)}</span><br>
+        <span style="font-size:11px;color:#6b7280;">Qté : ${Number(i.qty)}</span>
       </td>
       <td style="padding:10px 0;border-bottom:1px solid #f0ebe0;text-align:right;font-size:13px;color:#1A1A1A;font-weight:500;white-space:nowrap;">
-        ${(i.price * i.qty).toLocaleString('fr-MA')} MAD
+        ${(Number(i.price) * Number(i.qty)).toLocaleString('fr-MA')} MAD
       </td>
     </tr>
   `).join('')
@@ -52,8 +56,8 @@ function emailClient(data: {
           <tr>
             <td style="padding:40px 35px;">
               <p style="font-size:13px;color:#6b7280;text-transform:uppercase;letter-spacing:3px;margin:0 0 8px;">Confirmation de commande</p>
-              <h1 style="font-family:Georgia,serif;font-size:26px;font-weight:300;color:#1A1A1A;margin:0 0 6px;">Merci ${data.prenom} !</h1>
-              <p style="font-size:13px;color:#6b7280;margin:0 0 30px;">Votre commande <strong style="color:#1A1A1A;">${data.orderId}</strong> a bien été enregistrée.</p>
+              <h1 style="font-family:Georgia,serif;font-size:26px;font-weight:300;color:#1A1A1A;margin:0 0 6px;">Merci ${esc(data.prenom)} !</h1>
+              <p style="font-size:13px;color:#6b7280;margin:0 0 30px;">Votre commande <strong style="color:#1A1A1A;">${esc(data.orderId)}</strong> a bien été enregistrée.</p>
 
               <!-- Items -->
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
@@ -82,10 +86,10 @@ function emailClient(data: {
                 <tr>
                   <td width="48%" style="background:#F5F0E8;padding:18px;vertical-align:top;">
                     <p style="font-size:10px;text-transform:uppercase;letter-spacing:3px;color:#C4A35A;margin:0 0 8px;font-weight:600;">Livraison</p>
-                    <p style="font-size:12px;color:#1A1A1A;margin:0 0 4px;">${data.prenom} ${data.nom}</p>
-                    <p style="font-size:12px;color:#6b7280;margin:0 0 2px;">${data.adresse}</p>
-                    <p style="font-size:12px;color:#6b7280;margin:0 0 2px;">${data.ville}, Maroc</p>
-                    <p style="font-size:12px;color:#6b7280;margin:0;">${data.telephone}</p>
+                    <p style="font-size:12px;color:#1A1A1A;margin:0 0 4px;">${esc(data.prenom)} ${esc(data.nom)}</p>
+                    <p style="font-size:12px;color:#6b7280;margin:0 0 2px;">${esc(data.adresse)}</p>
+                    <p style="font-size:12px;color:#6b7280;margin:0 0 2px;">${esc(data.ville)}, Maroc</p>
+                    <p style="font-size:12px;color:#6b7280;margin:0;">${esc(data.telephone)}</p>
                   </td>
                   <td width="4%"></td>
                   <td width="48%" style="background:#F5F0E8;padding:18px;vertical-align:top;">
@@ -129,19 +133,19 @@ function emailAdmin(data: {
   total: number; orderId: string
 }) {
   const paymentLabel = '💵 Paiement à la livraison'
-  const itemsList = data.items.map(i => `• ${i.brand} — ${i.name} (x${i.qty}) — ${(i.price * i.qty).toLocaleString('fr-MA')} MAD`).join('\n')
+  const itemsList = data.items.map(i => `• ${esc(i.brand)} — ${esc(i.name)} (x${Number(i.qty)}) — ${(Number(i.price) * Number(i.qty)).toLocaleString('fr-MA')} MAD`).join('<br>')
 
   return `
   <div style="font-family:Arial,sans-serif;max-width:600px;padding:30px;background:#f9f7f4;">
-    <h2 style="color:#1A1A1A;border-bottom:2px solid #C4A35A;padding-bottom:10px;">🛍️ Nouvelle commande ${data.orderId}</h2>
-    <p><strong>Client :</strong> ${data.prenom} ${data.nom}</p>
-    <p><strong>Email :</strong> <a href="mailto:${data.email}">${data.email}</a></p>
-    <p><strong>Téléphone :</strong> ${data.telephone}</p>
-    <p><strong>Adresse :</strong> ${data.adresse}, ${data.ville}</p>
-    ${data.instructions ? `<p><strong>Instructions :</strong> ${data.instructions}</p>` : ''}
+    <h2 style="color:#1A1A1A;border-bottom:2px solid #C4A35A;padding-bottom:10px;">🛍️ Nouvelle commande ${esc(data.orderId)}</h2>
+    <p><strong>Client :</strong> ${esc(data.prenom)} ${esc(data.nom)}</p>
+    <p><strong>Email :</strong> <a href="mailto:${esc(data.email)}">${esc(data.email)}</a></p>
+    <p><strong>Téléphone :</strong> ${esc(data.telephone)}</p>
+    <p><strong>Adresse :</strong> ${esc(data.adresse)}, ${esc(data.ville)}</p>
+    ${data.instructions ? `<p><strong>Instructions :</strong> ${esc(data.instructions)}</p>` : ''}
     <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
     <p><strong>Articles :</strong></p>
-    <pre style="background:#fff;padding:15px;font-size:13px;">${itemsList}</pre>
+    <div style="background:#fff;padding:15px;font-size:13px;">${itemsList}</div>
     <p><strong>Total : <span style="color:#C4A35A;font-size:18px;">${data.total.toLocaleString('fr-MA')} MAD</span></strong></p>
     <p><strong>Paiement :</strong> ${paymentLabel}</p>
   </div>`
@@ -149,8 +153,26 @@ function emailAdmin(data: {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    if (!checkRateLimit(ip, 10, 60_000)) {
+      return NextResponse.json({ error: 'Trop de requêtes.' }, { status: 429 })
+    }
+
     const body = await req.json()
     const { form, items, paymentMethod, subtotal, shipping, total, orderId } = body
+
+    if (!form?.prenom || !form?.nom || !form?.email || !form?.telephone || !form?.adresse || !form?.ville) {
+      return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 })
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      return NextResponse.json({ error: 'Email invalide.' }, { status: 400 })
+    }
+    if (!Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ error: 'Panier vide.' }, { status: 400 })
+    }
+    if (typeof total !== 'number' || total <= 0) {
+      return NextResponse.json({ error: 'Total invalide.' }, { status: 400 })
+    }
 
     const adminEmail = process.env.ADMIN_EMAIL || 'contact@mobikit.ma'
 
