@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Truck, Check } from 'lucide-react'
+import { Truck, Check, Shield } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { calculateShipping, shippingZoneLabel } from '@/lib/shipping'
 
