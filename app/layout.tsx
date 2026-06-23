@@ -58,6 +58,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.mobikit.ma',
   },
+  verification: {
+    google: 'a13ae40b9e02823a',
+  },
 }
 
 const jsonLd = [
