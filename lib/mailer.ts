@@ -21,7 +21,7 @@ export function sendMail({ to, subject, html, replyTo, fromName = 'Mobikit' }: M
     if (!toClean) return reject(new Error('Destinataire manquant'))
 
     const payload = JSON.stringify({
-      sender: { name: fromName, email: 'turnexagency@gmail.com' },
+      sender: { name: fromName, email: 'contact@mobikit.ma' },
       to: [{ email: toClean }],
       ...(replyTo ? { replyTo: { email: clean(replyTo) } } : {}),
       subject,
