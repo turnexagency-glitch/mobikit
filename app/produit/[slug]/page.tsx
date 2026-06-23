@@ -162,7 +162,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
                 {[
                   { icon: Truck, label: 'Livraison', sub: 'Dès 500 DH' },
                   { icon: RefreshCw, label: 'Retours', sub: '14 jours' },
-                  { icon: Shield, label: 'Paiement', sub: 'Sécurisé CMI' },
+                  { icon: Shield, label: 'Paiement', sub: 'À la livraison' },
                 ].map(s => (
                   <div key={s.label} className="text-center">
                     <s.icon size={18} className="text-gold mx-auto mb-1.5" />

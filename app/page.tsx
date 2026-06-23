@@ -65,7 +65,7 @@ const brands = [
 
 const services = [
   { icon: Truck, title: 'Livraison au Maroc', desc: 'Livraison soignée dans tout le royaume' },
-  { icon: Shield, title: 'Paiement Sécurisé', desc: 'CMI & paiement à la livraison' },
+  { icon: Shield, title: 'Paiement Simple', desc: 'Paiement à la livraison, sans frais' },
   { icon: RefreshCw, title: 'Retours Faciles', desc: '14 jours pour changer d\'avis' },
   { icon: Headphones, title: 'Conseil Personnalisé', desc: 'Notre équipe vous accompagne' },
 ]

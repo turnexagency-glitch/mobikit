@@ -13,9 +13,7 @@ function emailClient(data: {
   paymentMethod: string; items: { name: string; brand: string; price: number; qty: number }[]
   subtotal: number; shipping: number; total: number; orderId: string
 }) {
-  const paymentLabel = data.paymentMethod === 'online'
-    ? 'Paiement en ligne sécurisé (CMI)'
-    : 'Paiement à la livraison (cash)'
+  const paymentLabel = 'Paiement à la livraison (cash)'
 
   const itemsHtml = data.items.map(i => `
     <tr>
@@ -93,10 +91,7 @@ function emailClient(data: {
                   <td width="48%" style="background:#F5F0E8;padding:18px;vertical-align:top;">
                     <p style="font-size:10px;text-transform:uppercase;letter-spacing:3px;color:#C4A35A;margin:0 0 8px;font-weight:600;">Paiement</p>
                     <p style="font-size:12px;color:#1A1A1A;margin:0 0 6px;">${paymentLabel}</p>
-                    ${data.paymentMethod === 'delivery'
-                      ? '<p style="font-size:11px;color:#6b7280;margin:0;">Préparez le montant exact lors de la livraison.</p>'
-                      : '<p style="font-size:11px;color:#16a34a;margin:0;">✓ Paiement sécurisé validé</p>'
-                    }
+                    <p style="font-size:11px;color:#6b7280;margin:0;">Préparez le montant exact lors de la livraison.</p>
                   </td>
                 </tr>
               </table>
@@ -133,7 +128,7 @@ function emailAdmin(data: {
   paymentMethod: string; items: { name: string; brand: string; price: number; qty: number }[]
   total: number; orderId: string
 }) {
-  const paymentLabel = data.paymentMethod === 'online' ? '💳 Paiement en ligne (CMI)' : '💵 Paiement à la livraison'
+  const paymentLabel = '💵 Paiement à la livraison'
   const itemsList = data.items.map(i => `• ${i.brand} — ${i.name} (x${i.qty}) — ${(i.price * i.qty).toLocaleString('fr-MA')} MAD`).join('\n')
 
   return `

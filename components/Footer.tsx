@@ -136,8 +136,8 @@ export default function Footer() {
             </ul>
 
             <div className="mt-6 p-4 border border-white/20">
-              <p className="text-[10px] text-gray-400 tracking-wide mb-1">Paiement Sécurisé</p>
-              <p className="text-xs text-gray-300">CMI · Carte Bancaire · Paiement à la livraison</p>
+              <p className="text-[10px] text-gray-400 tracking-wide mb-1">Paiement</p>
+              <p className="text-xs text-gray-300">Paiement à la livraison</p>
             </div>
           </div>
         </div>

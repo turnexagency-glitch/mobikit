@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Shield, Truck, Check } from 'lucide-react'
+import { Truck, Check } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { calculateShipping, shippingZoneLabel } from '@/lib/shipping'
 
@@ -119,8 +119,7 @@ export default function CommandePage() {
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link href="/" className="font-serif text-xl font-light text-charcoal">Mobikit</Link>
           <div className="flex items-center gap-2 text-xs text-charcoal-light">
-            <Shield size={12} className="text-gold" />
-            Paiement sécurisé
+            Commande sécurisée
           </div>
         </div>
       </div>
@@ -206,8 +205,7 @@ export default function CommandePage() {
               }
             </button>
 
-            <p className="text-[11px] text-charcoal-light text-center flex items-center justify-center gap-1.5">
-              <Shield size={11} className="text-gold" />
+            <p className="text-[11px] text-charcoal-light text-center">
               Vos données sont protégées et ne seront jamais partagées
             </p>
           </div>

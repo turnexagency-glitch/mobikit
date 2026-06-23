@@ -30,8 +30,7 @@ const faqs = [
   {
     category: 'Paiement',
     questions: [
-      { q: 'Quels modes de paiement acceptez-vous ?', a: 'Nous acceptons les paiements par carte bancaire (CMI), le paiement à la livraison (cash on delivery) pour les commandes jusqu\'à 5 000 MAD, ainsi que le virement bancaire pour les grandes commandes.' },
-      { q: 'Le paiement en ligne est-il sécurisé ?', a: 'Oui, notre plateforme de paiement utilise la technologie CMI avec cryptage SSL. Vos données bancaires ne sont jamais stockées sur nos serveurs.' },
+      { q: 'Quels modes de paiement acceptez-vous ?', a: 'Nous acceptons uniquement le paiement à la livraison (cash on delivery). Vous réglez en espèces à la réception de votre commande, sans frais supplémentaires.' },
       { q: 'Puis-je payer en plusieurs fois ?', a: 'Nous étudions les demandes de paiement échelonné pour les commandes importantes. Contactez notre service client pour plus d\'informations.' },
     ]
   },
