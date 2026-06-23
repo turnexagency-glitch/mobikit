@@ -11,15 +11,19 @@ interface MailOptions {
   fromName?: string
 }
 
+const clean = (s?: string) => s?.trim().replace(/[\r\n]/g, '') ?? ''
+
 export function sendMail({ to, subject, html, replyTo, fromName = 'Mobikit' }: MailOptions): Promise<void> {
   return new Promise((resolve, reject) => {
-    const apiKey = process.env.BREVO_API_KEY?.trim().replace(/[\r\n]/g, '')
+    const apiKey = clean(process.env.BREVO_API_KEY)
+    const toClean = clean(to)
     if (!apiKey) return reject(new Error('BREVO_API_KEY manquante'))
+    if (!toClean) return reject(new Error('Destinataire manquant'))
 
     const payload = JSON.stringify({
       sender: { name: fromName, email: 'turnexagency@gmail.com' },
-      to: [{ email: to }],
-      ...(replyTo ? { replyTo: { email: replyTo } } : {}),
+      to: [{ email: toClean }],
+      ...(replyTo ? { replyTo: { email: clean(replyTo) } } : {}),
       subject,
       htmlContent: html,
     })
