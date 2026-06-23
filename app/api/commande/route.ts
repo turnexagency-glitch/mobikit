@@ -1,8 +1,6 @@
-import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { transporter } from '@/lib/mailer'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -159,8 +157,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { form, items, paymentMethod, subtotal, shipping, total, orderId } = body
 
-    const fromEmail = process.env.FROM_EMAIL || 'noreply@mobikit.ma'
-    const adminEmail = process.env.ADMIN_EMAIL || 'mobikit@mobikit.ma'
+    const fromEmail  = process.env.SMTP_USER    || 'contact@mobikit.ma'
+    const adminEmail = process.env.ADMIN_EMAIL  || 'contact@mobikit.ma'
 
     // Save order to Supabase
     try {
@@ -191,21 +189,16 @@ export async function POST(req: NextRequest) {
       console.error('Supabase save error:', e)
     }
 
-    if (!process.env.RESEND_API_KEY) {
-      console.warn('RESEND_API_KEY non configuré — email non envoyé')
-      return NextResponse.json({ success: true, orderId, emailSent: false })
-    }
-
     try {
       await Promise.all([
-        resend.emails.send({
-          from: `Mobikit Home Collections <${fromEmail}>`,
+        transporter.sendMail({
+          from: `"Mobikit Home Collections" <${fromEmail}>`,
           to: form.email,
           subject: `Confirmation de commande ${orderId} — Mobikit`,
           html: emailClient({ ...form, paymentMethod, items, subtotal, shipping, total, orderId }),
         }),
-        resend.emails.send({
-          from: `Mobikit Boutique <${fromEmail}>`,
+        transporter.sendMail({
+          from: `"Mobikit Boutique" <${fromEmail}>`,
           to: adminEmail,
           subject: `🛍️ Nouvelle commande ${orderId} — ${form.prenom} ${form.nom} — ${total.toLocaleString('fr-MA')} MAD`,
           html: emailAdmin({ ...form, paymentMethod, items, total, orderId }),
@@ -213,7 +206,7 @@ export async function POST(req: NextRequest) {
       ])
       return NextResponse.json({ success: true, orderId, emailSent: true })
     } catch (emailErr) {
-      console.error('Resend error (order saved):', emailErr)
+      console.error('SMTP error (order saved):', emailErr)
       return NextResponse.json({ success: true, orderId, emailSent: false })
     }
   } catch (err) {

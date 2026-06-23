@@ -1,23 +1,18 @@
-import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { transporter } from '@/lib/mailer'
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { nom, email, telephone, sujet, message } = body
 
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json({ success: false, error: 'Email non configuré' }, { status: 500 })
-    }
-
-    const fromEmail = process.env.FROM_EMAIL || 'noreply@mobikit.ma'
-    const adminEmail = process.env.ADMIN_EMAIL || 'mobikit@mobikit.ma'
+    const adminEmail = process.env.ADMIN_EMAIL || 'contact@mobikit.ma'
+    const fromEmail  = process.env.SMTP_USER    || 'contact@mobikit.ma'
 
     await Promise.all([
-      resend.emails.send({
-        from: `Mobikit Site Web <${fromEmail}>`,
+      // Notification admin
+      transporter.sendMail({
+        from: `"Mobikit Site Web" <${fromEmail}>`,
         to: adminEmail,
         replyTo: email,
         subject: `📩 Nouveau message — ${sujet} | ${nom}`,
@@ -43,8 +38,9 @@ export async function POST(req: NextRequest) {
         `,
       }),
 
-      resend.emails.send({
-        from: `Mobikit Home Collections <${fromEmail}>`,
+      // Confirmation client
+      transporter.sendMail({
+        from: `"Mobikit Home Collections" <${fromEmail}>`,
         to: email,
         subject: 'Votre message a bien été reçu — Mobikit',
         html: `
@@ -73,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('Resend contact error:', err)
-    return NextResponse.json({ success: false }, { status: 500 })
+    console.error('SMTP contact error:', err)
+    return NextResponse.json({ success: false, error: 'Erreur envoi email' }, { status: 500 })
   }
 }
