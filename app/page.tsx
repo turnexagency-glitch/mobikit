@@ -5,7 +5,8 @@ import { ArrowRight, Star, Truck, Shield, RefreshCw, Headphones } from 'lucide-r
 import SmartImage from '@/components/SmartImage'
 import { getFeaturedProducts, getAllPosts } from '@/lib/supabase'
 
-export const dynamic = 'force-dynamic'
+
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Mobikit | Linge de Maison Haut de Gamme au Maroc — Descamps, Treca, Pyrenex',
@@ -95,13 +96,13 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="relative flex items-center justify-center overflow-hidden" style={{ height: 'calc(100vh - 184px)', minHeight: 560 }}>
         <div className="absolute inset-0">
-          <SmartImage
-            src="/images/descamps-lit-tropical.jpg"
-            fallback="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1920&q=90"
-            alt="Mobikit Home Collections"
+          <Image
+            src="/images/descamps-bed-teal.webp"
+            alt="Mobikit Home Collections — Linge de Maison Haut de Gamme"
             fill
             className="object-cover"
             priority
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
         </div>
@@ -191,6 +192,7 @@ export default async function HomePage() {
                   alt="Mobikit Showroom Casablanca"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 bg-gold text-white p-8 hidden lg:block">
@@ -399,6 +401,7 @@ export default async function HomePage() {
             alt="Mobikit Showroom Casablanca"
             fill
             className="object-cover"
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-charcoal-dark/80" />
         </div>

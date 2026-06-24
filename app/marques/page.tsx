@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 }
 import { brands as localBrands } from '@/data/brands'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
 const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&q=80'
 

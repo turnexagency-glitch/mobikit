@@ -6,7 +6,7 @@ import { getBrandBySlug } from '@/lib/sanity'
 import { getProductsByBrand } from '@/lib/supabase'
 import { getBrand } from '@/data/brands'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600
 
 const brandKeywords: Record<string, string> = {
   'descamps':               'Descamps Maroc, Descamps Casablanca, linge de maison Descamps Maroc, parure de lit Descamps, distributeur officiel Descamps Maroc, draps Descamps Maroc',

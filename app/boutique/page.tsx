@@ -27,7 +27,7 @@ const categories = [
   { name: 'Accessoires Salle de Bain', href: '/boutique/accessoires-sdb', image: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&q=80' },
 ]
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 const boutiqueSchema = {
   '@context': 'https://schema.org',

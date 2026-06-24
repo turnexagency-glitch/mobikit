@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.mobikit.ma/blog' },
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 const categories = ['Tous', 'Inspirations', 'Guide d\'Achat', 'Tendances', 'Conseils', 'Nos Marques']
 

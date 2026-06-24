@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductsByCategory } from '@/lib/supabase'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 const categoryLabels: Record<string, string> = {
   'linge-de-lit': 'Linge de Lit',
